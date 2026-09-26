@@ -7,8 +7,9 @@ This is the active work; the completed Fedora task list below is historical.
 - [x] Inspect detached origin/main and create a focused branch.
 - [x] Implement native process queries and core build integration.
 - [x] Add a native build/process gate and document the unported boundaries.
-- [ ] Run the gate on FreeBSD 15.1 amd64.
-- [ ] Verify X11 launching, swallowing, status clicks and TOML reloads.
+- [x] Run the gate on FreeBSD 15.1 amd64; see docs/FREEBSD-CI-REVIEW.md.
+- [x] Verify basic X11 launching, terminal hotkey, tags, close and logout in CI.
+- [ ] Verify swallowing, status clicks and TOML save/rename reloads.
 - [ ] Complete native validation and review before merging as a usable port.
 
 ## Fedora 0.7.2 initial updates

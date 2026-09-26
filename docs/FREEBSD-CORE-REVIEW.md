@@ -1,5 +1,8 @@
 # FreeBSD core preparation: review evidence
 
+This records the initial preparation review. Subsequent native build/process
+and basic X11 results are recorded in [FREEBSD-CI-REVIEW.md](FREEBSD-CI-REVIEW.md).
+
 Base: `origin/main`, commit `e5bbddc0c7261951d351d9a7c502a9952fc0b624`.
 Branch: `codex/freebsd-core-foundation`.
 Authoring environment: Windows/PowerShell with Git Bash; no FreeBSD test host.

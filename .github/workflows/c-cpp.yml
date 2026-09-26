@@ -6,6 +6,11 @@ on:
     paths-ignore:
       - "docs/**"
       - "**/*.md"
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   workflow_dispatch:
 
 permissions:
@@ -18,37 +23,33 @@ concurrency:
 jobs:
   validate:
     name: Desktop smoke
+    # GitHub provides no standard FreeBSD runner; this host only boots the VM.
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    container: fedora:44
-    defaults:
-      run:
-        shell: bash
-    env:
-      DWM_TEST_TMP_ROOT: /var/tmp/dwm-ci
+    timeout-minutes: 30
 
     steps:
-      - name: Install checkout dependency
-        run: dnf install -y --setopt=install_weak_deps=False git-core
-
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: Install build and smoke dependencies
-        run: |
-          source scripts/dwm-packages.sh
-          mapfile -t packages < <(dwm_packages fedora ci-smoke)
-          dnf install -y --setopt=install_weak_deps=False "${packages[@]}"
-
-      - name: Build dwm
-        run: |
-          scripts/run-tests make clean all
-          chmod 0755 dwm
-
-      - name: Launch desktop and check basic interaction
-        timeout-minutes: 2
-        run: |
-          install -d -m 0700 -o nobody -g nobody /home/dwm-ci /run/dwm-ci "$DWM_TEST_TMP_ROOT"
-          runuser -u nobody -- env HOME=/home/dwm-ci XDG_RUNTIME_DIR=/run/dwm-ci \
-            scripts/run-tests timeout --kill-after=5s 90s python3 tests/test-desktop-smoke.py
+      - name: Build and test inside FreeBSD 15.1
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
+        with:
+          release: "15.1"
+          arch: x86_64
+          mem: 4096
+          copyback: false
+          prepare: |
+            set -eu
+            pkg install -y gmake pkgconf libinotify \
+              libX11 libXft libXinerama libXrender libxcb xcb-util \
+              imlib2 freetype2 fontconfig python3 \
+              xorg-vfbserver xterm xdotool xprop noto-sans-mono noto-emoji
+            pw useradd -n dwmci -m -s /bin/sh
+          run: |
+            set -eu
+            freebsd-version -kru
+            uname -m
+            cp -R . /home/dwmci/source
+            chown -R dwmci:dwmci /home/dwmci/source
+            su -l dwmci -c 'cd /home/dwmci/source && env DWM_FREEBSD_X11_SMOKE=1 sh tests/test-freebsd-core.sh'

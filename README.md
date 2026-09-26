@@ -2,8 +2,9 @@
 
 This detached fork is being adapted to **FreeBSD 15.1 amd64 and X11**.
 Start with [the FreeBSD build instructions and port status](docs/FREEBSD.md).
-The initial core changes are preparatory and have not yet been tested on a
-FreeBSD host. The inherited desktop installer and system providers are unported.
+The core build, native process tests and basic X11 smoke now pass in FreeBSD CI;
+see [the test evidence](docs/FREEBSD-CI-REVIEW.md). The inherited desktop installer
+and system providers are unported.
 
 The content below describes the historical upstream Fedora desktop, not a
 working FreeBSD release. Follow the FreeBSD instructions above for this fork.
