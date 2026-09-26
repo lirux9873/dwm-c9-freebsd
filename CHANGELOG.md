@@ -6,6 +6,12 @@ versions from `config.mk`.
 
 ## [Unreleased]
 
+### FreeBSD CI
+
+- Run `Desktop smoke` builds and tests inside a FreeBSD 15.1 amd64 VM instead
+  of a Fedora container. Add pull-request coverage and a native Xvfb core
+  smoke test without the unported managed-shell service providers.
+
 ### FreeBSD core preparation
 
 - Add FreeBSD sysctl process queries and executable-path discovery, and enable

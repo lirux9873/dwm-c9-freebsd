@@ -38,4 +38,9 @@ mkdir -p "$work/stage/usr/local/bin"
 install -m 755 "$work/source/dwm" "$work/stage/usr/local/bin/dwm-c9"
 cmp "$work/source/dwm" "$work/stage/usr/local/bin/dwm-c9"
 printf '%s\n' 'Native process tests, clean core build and manual binary staging passed.'
-printf '%s\n' 'This does not test the desktop installer or an X11 session.'
+if [ "${DWM_FREEBSD_X11_SMOKE:-0}" = 1 ]; then
+	python3 "$repo/tests/test-freebsd-desktop-smoke.py" "$work/source/dwm"
+else
+	printf '%s\n' 'X11 smoke skipped; set DWM_FREEBSD_X11_SMOKE=1 to enable it.'
+fi
+printf '%s\n' 'The full desktop installer and Quickshell services are not tested.'

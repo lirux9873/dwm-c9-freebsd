@@ -100,6 +100,20 @@ still needs the repository-wide cleanup in milestone 2.
 
 ## Validation status
 
+The `Desktop smoke` Actions job now boots a FreeBSD 15.1 amd64 VM with the
+pinned `vmactions/freebsd-vm` action. GitHub's Ubuntu host only orchestrates the
+VM; package installation uses `pkg`, and compilation and tests run inside
+FreeBSD. The job runs on pull requests, pushes to main and manual dispatch.
+
+The VM creates an unprivileged `dwmci` user, runs the native process/build gate,
+then exercises dwm in Xvfb: terminal spawning through a hotkey, tag changes,
+closing a client and clean logout. It uses isolated configuration with no
+inherited autostart helpers. This replaces the Fedora-specific managed-shell
+smoke, not the still-pending Quickshell or physical-hardware qualification.
+To reproduce the X11 gate locally, install `python3 xorg-vfbserver xterm xdotool
+xprop noto-sans-mono noto-emoji` in addition to the build dependencies, then run
+`env DWM_FREEBSD_X11_SMOKE=1 sh tests/test-freebsd-core.sh` as a regular user.
+
 The authoring host is Windows. The owner currently has no FreeBSD test host.
 Source inspection and static checks cannot establish a working FreeBSD binary,
 graphics driver, audio stack or desktop session. No native tests or full Fedora
