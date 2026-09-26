@@ -114,10 +114,14 @@ To reproduce the X11 gate locally, install `python3 xorg-vfbserver xterm xdotool
 xprop noto-sans-mono noto-emoji` in addition to the build dependencies, then run
 `env DWM_FREEBSD_X11_SMOKE=1 sh tests/test-freebsd-core.sh` as a regular user.
 
-The authoring host is Windows. The owner currently has no FreeBSD test host.
-Source inspection and static checks cannot establish a working FreeBSD binary,
-graphics driver, audio stack or desktop session. No native tests or full Fedora
-regression suite have been run for this change set yet. Do not claim otherwise.
+The authoring host is Windows; native validation is now available through CI.
+[Run 36231369609](https://github.com/lirux9873/dwm-c9-freebsd/actions/runs/36231369609)
+passed on FreeBSD 15.1-RELEASE-p3 amd64: package installation, native process
+tests, clean build, manual binary staging and basic X11 smoke. See
+[the CI evidence](FREEBSD-CI-REVIEW.md) for the exact tested commit and limits.
+Swallowing end-to-end, status clicks, save/rename hot reloads, the full Quickshell
+session, physical GPU drivers and audio remain unverified. The inherited full
+Fedora regression suite has not been run for this change.
 
 Native API references:
 

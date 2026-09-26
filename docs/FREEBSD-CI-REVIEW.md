@@ -15,13 +15,22 @@ Local checks on Windows:
 - Python AST parsing of `tests/test-freebsd-desktop-smoke.py`: passed.
 - `git diff --check`: passed.
 - Independent source review of workflow, gate and smoke: no actionable findings.
-- YAML parser unavailable locally; workflow acceptance is checked by GitHub.
+- YAML parser unavailable locally; GitHub accepted and executed the workflow.
 - The Codex review CLI was unavailable in this task's environment (home-directory
   initialization failure during the preceding core review); independent source
   review was performed by a review agent.
 
-Hosted execution is pending when this change is first published. Do not infer
-native success from local syntax checks. The workflow intentionally replaces
+## Hosted result
+
+[Run 36231369609](https://github.com/lirux9873/dwm-c9-freebsd/actions/runs/36231369609)
+passed for code commit `f3591cb239899483fa7ee37c54bd359c95eeefe1` on
+2026-09-26. The guest reported FreeBSD **15.1-RELEASE-p3**, amd64.
+Package resolution, native process tests, clean core build, manual binary
+staging and the unprivileged X11 smoke all passed. Clang reported two existing
+non-prototype declaration warnings for `getstatusbarpid`; there were no build
+errors. Subsequent documentation-only changes reuse this code validation.
+
+The workflow intentionally replaces
 the inherited Fedora/Quickshell smoke with native core coverage: spawning a
 terminal through a hotkey, tag changes, client closing and normal logout under
 Xvfb as an unprivileged user. Full Quickshell services, physical GPUs, audio and
