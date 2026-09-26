@@ -16,14 +16,17 @@ interface Props {
 
 const { frontmatter, wide = false } = Astro.props;
 const title = Astro.props.title ?? frontmatter?.title ?? "Documentation";
-const description = Astro.props.description ?? frontmatter?.description ?? "Documentation for the dwm-titus Fedora X11 desktop.";
+const description = Astro.props.description ?? frontmatter?.description ?? "Documentation for the dwm-c9-freebsd FreeBSD 15.1 X11 desktop.";
 const eyebrow = Astro.props.eyebrow ?? frontmatter?.eyebrow ?? "Documentation";
-const pathname = Astro.url.pathname;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const localUrl = (href: string) => href.startsWith("/") ? base + href : href;
+const pathname = Astro.url.pathname.slice(base.length) || "/";
+const isCurrentGuide = ["/", "/index.html", "/install.html", "/documentation.html"].includes(pathname);
 const currentHref = pathname === "/" || pathname === "/index.html" ? "/install.html" : pathname;
 const pageIndex = Math.max(0, navigation.findIndex((item) => item.href === currentHref));
 const previous = pageIndex > 0 ? navigation[pageIndex - 1] : undefined;
 const next = pageIndex < navigation.length - 1 ? navigation[pageIndex + 1] : undefined;
-const canonical = new URL(pathname === "/index.html" ? "/" : pathname, Astro.site);
+const canonical = new URL(localUrl(pathname === "/index.html" ? "/" : pathname), Astro.site);
 ---
 
 <!doctype html>
@@ -34,7 +37,7 @@ const canonical = new URL(pathname === "/index.html" ? "/" : pathname, Astro.sit
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0d0f0f" />
     <link rel="canonical" href={canonical} />
-    <title>{title} | dwm-titus</title>
+    <title>{title} | dwm-c9-freebsd</title>
     <script is:inline>
       document.documentElement.dataset.js = "true";
       try {
@@ -51,17 +54,17 @@ const canonical = new URL(pathname === "/index.html" ? "/" : pathname, Astro.sit
         <button class="menu-button" type="button" aria-label="Open documentation navigation" aria-expanded="false" data-menu-button>
           <span></span><span></span><span></span>
         </button>
-        <a class="site-brand" href="/" aria-label="dwm-titus documentation home">
+        <a class="site-brand" href={localUrl("/")} aria-label="dwm-c9-freebsd documentation home">
           <span class="site-mark">d</span>
-          <span><strong>dwm-titus</strong><small>Fedora X11 desktop</small></span>
+          <span><strong>dwm-c9-freebsd</strong><small>FreeBSD 15.1 X11 desktop</small></span>
         </a>
         <div class="site-header-actions">
-          <a class="header-link" href="https://github.com/ChrisTitusTech/dwm-titus/releases/latest">Get the latest release</a>
+          <a class="header-link" href="https://github.com/lirux9873/dwm-c9-freebsd">View the source</a>
           <button class="theme-button" type="button" aria-label="Switch color theme" data-theme-button>
             <span class="theme-sun" aria-hidden="true">Light</span>
             <span class="theme-moon" aria-hidden="true">Dark</span>
           </button>
-          <a class="repo-button" href="https://github.com/ChrisTitusTech/dwm-titus">GitHub <span aria-hidden="true">-&gt;</span></a>
+          <a class="repo-button" href="https://github.com/lirux9873/dwm-c9-freebsd">GitHub <span aria-hidden="true">-&gt;</span></a>
         </div>
       </div>
     </header>
@@ -70,16 +73,16 @@ const canonical = new URL(pathname === "/index.html" ? "/" : pathname, Astro.sit
       <aside class="sidebar" aria-label="Documentation navigation">
         <div class="sidebar-intro">
           <span class="status-dot"></span>
-          <span>Fedora only / X11 native</span>
+          <span>FreeBSD port / X11</span>
         </div>
         <nav>
-          <p class="nav-label">Explore the desktop</p>
+          <p class="nav-label">Guides and inherited references</p>
           <ol>
             {navigation.map((item) => {
               const active = item.href === currentHref;
               return (
                 <li>
-                  <a href={item.href} aria-current={active ? "page" : undefined}>
+                  <a href={localUrl(item.href)} aria-current={active ? "page" : undefined}>
                     <span>{item.index}</span>
                     <strong>{item.label}</strong>
                   </a>
@@ -99,18 +102,19 @@ const canonical = new URL(pathname === "/index.html" ? "/" : pathname, Astro.sit
       <main id="main-content" class="main-content">
         <div class="page-meta">
           <span>{eyebrow}</span>
-          <span>Updated with the current release</span>
+          <span>FreeBSD migration in progress</span>
         </div>
         <article class:list={["doc-content", { "doc-content-wide": wide }]}>
+          {!isCurrentGuide && <aside class="migration-notice"><strong>Inherited Fedora reference</strong><p>This page describes the upstream Linux desktop and has not been adapted to FreeBSD. Do not use its installation or system-service commands on FreeBSD. Start with the <a href={localUrl("/")}>FreeBSD guide</a> for supported scope and validation.</p></aside>}
           <slot />
         </article>
         <nav class="page-turner" aria-label="Previous and next documentation pages">
-          {previous ? <a class="page-previous" href={previous.href}><span>Previous</span><strong>{previous.label}</strong></a> : <span></span>}
-          {next ? <a class="page-next" href={next.href}><span>Next</span><strong>{next.label}</strong></a> : <span></span>}
+          {previous ? <a class="page-previous" href={localUrl(previous.href)}><span>Previous</span><strong>{previous.label}</strong></a> : <span></span>}
+          {next ? <a class="page-next" href={localUrl(next.href)}><span>Next</span><strong>{next.label}</strong></a> : <span></span>}
         </nav>
         <footer class="site-footer">
-          <p>dwm-titus is an open source Fedora X11 desktop.</p>
-          <p><a href="https://github.com/ChrisTitusTech/dwm-titus/blob/main/LICENSE">License</a> <span>/</span> <a href="https://github.com/ChrisTitusTech/dwm-titus/issues">Report an issue</a></p>
+          <p>dwm-c9-freebsd is an open source FreeBSD 15.1 X11 desktop.</p>
+          <p><a href="https://github.com/lirux9873/dwm-c9-freebsd/blob/main/LICENSE">License</a> <span>/</span> <a href="https://github.com/lirux9873/dwm-c9-freebsd/issues">Report an issue</a></p>
         </footer>
       </main>
     </div>

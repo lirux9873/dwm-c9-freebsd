@@ -54,13 +54,10 @@ As the regular user:
 ```sh
 git clone https://github.com/lirux9873/dwm-c9-freebsd.git
 cd dwm-c9-freebsd
-git switch codex/freebsd-core-foundation
 sh tests/test-freebsd-core.sh
 ```
 
-The topic-branch command requires that branch to have been published. For a
-local checkout containing this change, just run the last command. Save its
-output and `freebsd-version -kru` when reporting results. The gate builds in a
+The default branch contains the port. Save the test output and `freebsd-version -kru` when reporting results. The gate builds in a
 private temporary directory and cleans that directory on exit.
 
 For an inspectable local build:
@@ -118,7 +115,7 @@ The authoring host is Windows; native validation is now available through CI.
 [Run 36231369609](https://github.com/lirux9873/dwm-c9-freebsd/actions/runs/36231369609)
 passed on FreeBSD 15.1-RELEASE-p3 amd64: package installation, native process
 tests, clean build, manual binary staging and basic X11 smoke. See
-[the CI evidence](FREEBSD-CI-REVIEW.md) for the exact tested commit and limits.
+[the CI evidence](https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-CI-REVIEW.md) for the exact tested commit and limits.
 Swallowing end-to-end, status clicks, save/rename hot reloads, the full Quickshell
 session, physical GPU drivers and audio remain unverified. The inherited full
 Fedora regression suite has not been run for this change.

@@ -168,6 +168,6 @@ from the everyday desktop:
   `edk2-ovmf`, `libguestfs`, `pykickstart`, `xz`, `zstd`, and `time`, in addition
   to image-assembly tools.
 
-For installation steps, return to [Installation](/install.html). For the
+For installation steps, return to [Installation](/dwm-c9-freebsd/install.html). For the
 underlying contracts, see the
 [project specification](https://github.com/ChrisTitusTech/dwm-titus/blob/main/SPEC.md).
