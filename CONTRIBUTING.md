@@ -1,5 +1,11 @@
 # Contributing
 
+This repository is migrating to FreeBSD 15.1. Start with
+[the native port status and build gate](docs/FREEBSD.md). The Fedora instructions
+below describe the inherited implementation and are not the FreeBSD validation
+contract. Record unavailable native checks explicitly; do not merge unvalidated
+core changes as a completed FreeBSD port.
+
 Thanks for helping improve dwm-titus. Changes should preserve the small X11
 window-manager core, existing user workflows, and the Fedora-only desktop
 target. Fedora Linux is the sole supported distribution.

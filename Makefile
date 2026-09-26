@@ -20,6 +20,9 @@ CAPITAINE_LICENSE_DIR = ${DATADIR}/licenses/dwm-titus/capitaine-cursors
 run_managed_test = if [ -n "$${DWM_TEST_WORKSPACE:-}" ] && [ -n "$${DWM_TEST_RUNNER_TOKEN:-}" ] && [ "$${TMPDIR:-}" = "$${DWM_TEST_WORKSPACE}" ] && [ -f "$${DWM_TEST_WORKSPACE}/.runner" ] && [ ! -L "$${DWM_TEST_WORKSPACE}/.runner" ] && [ "$$(cat "$${DWM_TEST_WORKSPACE}/.runner" 2>/dev/null)" = "$${DWM_TEST_RUNNER_TOKEN}" ]; then $(1); else scripts/run-tests $(1); fi
 
 SRC = drw.c dwm.c util.c tomlparser.c
+ifeq (${HOST_OS},FreeBSD)
+SRC += freebsd-process.c
+endif
 OBJ = ${SRC:.c=.o}
 
 INSTALL_COMMANDS = \
@@ -98,6 +101,7 @@ all: dwm
 	${CC} ${CPPFLAGS} ${CFLAGS} -c $<
 
 ${OBJ}: config.h config.mk Makefile
+dwm.o freebsd-process.o: freebsd-process.h
 drw.o: drw.h util.h
 dwm.o: drw.h util.h tomlparser.h
 util.o: util.h
@@ -131,6 +135,10 @@ native:
 	$(MAKE) OPTIMISATIONS="${NATIVE_OPTIMISATIONS}" all
 
 install:
+	@if [ "$$(uname -s)" = FreeBSD ]; then \
+		echo "The inherited desktop installer is not ported. See docs/FREEBSD.md for the core build." >&2; \
+		exit 1; \
+	fi
 	if [ -z "${DESTDIR}" ] && [ "$$(id -u)" -eq 0 ] && \
 		{ [ -z "${OWNER}" ] || [ "${OWNER}" = root ]; }; then \
 		echo "Refusing to install user files as root. Run install-user as the target user." >&2; \

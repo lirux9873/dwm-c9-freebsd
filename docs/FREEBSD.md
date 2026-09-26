@@ -1,0 +1,112 @@
+# dwm-c9-freebsd: FreeBSD 15.1 migration
+
+Repository: [lirux9873/dwm-c9-freebsd](https://github.com/lirux9873/dwm-c9-freebsd).
+Initial baseline: `e5bbddc0c7261951d351d9a7c502a9952fc0b624`.
+Target: FreeBSD 15.1-RELEASE amd64, X11, native applications.
+
+This is a port in progress. The first change set addresses the C window manager
+and its build dependencies. The inherited full desktop installer, session
+helpers, QML system providers and Fedora image pipeline are not a FreeBSD port.
+Do not run `install.sh`, `gmake install`, or `scripts/dev-sync-install.sh` to
+install this snapshot on FreeBSD. `gmake install` now refuses that platform.
+
+## Implemented in the first change set
+
+- GNU make detects FreeBSD and links the native `libinotify` package, keeping
+  BSD process declarations visible. Local dependencies use `LOCALBASE`, which
+  defaults to `/usr/local`, independently of the installation `PREFIX`.
+- `getparentprocess()` uses `KERN_PROC_PID` through `sysctl` on FreeBSD.
+- XCB RES local-client PID discovery is enabled on FreeBSD. Combined with the
+  parent-process query, this supplies the missing native pieces for swallowing;
+  actual Xorg support and runtime behavior still need testing.
+- Executable discovery uses `KERN_PROC_PATHNAME` instead of `/proc/self/exe`.
+- Status-process discovery uses base `pgrep`, then validates native process
+  identity and user, accepting either dwm's session or its recorded autostart
+  session. It does not parse Linux procfs.
+- Application spawning uses a valid PID result pointer and reports failures.
+- A native test gate exercises process ancestry, session separation, missing
+  processes, executable paths, buffer limits, a clean core build and manual
+  binary staging. It does not modify a live desktop.
+
+`libinotify` is a native compatibility library backed by FreeBSD event facilities,
+not a Linux binary dependency. A future kqueue implementation is optional;
+matching save/rename hot-reload behavior must be tested either way.
+
+## Prepare a FreeBSD test host
+
+Install a FreeBSD 15.1 VM or machine before treating this as a usable desktop.
+As root, install the build dependencies:
+
+```sh
+pkg install git gmake pkgconf libinotify \
+  libX11 libXft libXinerama libXrender libxcb xcb-util \
+  imlib2 freetype2 fontconfig
+```
+
+Base `cc` supplies Clang. Query the target repository if any package is missing;
+do not force packages for another FreeBSD ABI. Package definitions were checked
+against the official [FreeBSD ports index](https://download.freebsd.org/ports/index/).
+Install Xorg, the appropriate GPU driver and an X11 terminal separately for
+runtime validation; see the [FreeBSD X11 handbook](https://docs.freebsd.org/en/books/handbook/x11/).
+
+As the regular user:
+
+```sh
+git clone https://github.com/lirux9873/dwm-c9-freebsd.git
+cd dwm-c9-freebsd
+git switch codex/freebsd-core-foundation
+sh tests/test-freebsd-core.sh
+```
+
+The topic-branch command requires that branch to have been published. For a
+local checkout containing this change, just run the last command. Save its
+output and `freebsd-version -kru` when reporting results. The gate builds in a
+private temporary directory and cleans that directory on exit.
+
+For an inspectable local build:
+
+```sh
+gmake CC=cc clean all
+ldd ./dwm
+```
+
+The Makefile creates `config.h` only if it is absent. This produces a binary;
+it does not install a native desktop or provide a complete session. For the
+initial X11 trial, use isolated XDG configuration/data directories and native
+hotkeys from the earlier installation guide. Do not copy the inherited
+autostart scripts into those data directories. Do not install the inherited
+`dwm-session-launch` helper yet; it still contains GNU `stat` and updater
+assumptions. With no adjacent launcher helper, dwm launches applications directly.
+
+## Remaining migration work
+
+1. Validate this core on FreeBSD 15.1: process tests, clean build, X11 launch,
+   terminal spawning/swallowing, tags, focus, hot-reload saves/renames and logout.
+2. Replace the inherited dependency/installation profiles with the reduced
+   native package scope. Remove unwanted optional integrations from helpers,
+   defaults, settings, tests and documentation, including their UI actions.
+3. Supply native startup/shutdown, config-preserving installation, fonts and
+   desktop-file paths; remove the active Linux-specific service lifecycle.
+4. Adapt the Quickshell providers for audio, networking, Bluetooth, brightness,
+   power, input and display hotplug. Native package availability does not imply
+   compatible service APIs.
+5. Replace package updates, privilege helpers and recovery with FreeBSD-aware
+   operations. Keep automatic updates inactive until that design is validated.
+6. Replace inherited CI/release/image workflows and finish branding and docs.
+
+The previously removed optional applications are outside this fork's target
+scope. They are not reintroduced by this core change. Their inherited source
+still needs the repository-wide cleanup in milestone 2.
+
+## Validation status
+
+The authoring host is Windows. The owner currently has no FreeBSD test host.
+Source inspection and static checks cannot establish a working FreeBSD binary,
+graphics driver, audio stack or desktop session. No native tests or full Fedora
+regression suite have been run for this change set yet. Do not claim otherwise.
+
+Native API references:
+
+- [FreeBSD 15.1 process structures](https://github.com/freebsd/freebsd-src/blob/releng/15.1/sys/sys/user.h)
+- [FreeBSD 15.1 process sysctl implementation](https://github.com/freebsd/freebsd-src/blob/releng/15.1/sys/kern/kern_proc.c)
+- [FreeBSD libinotify port](https://cgit.freebsd.org/ports/tree/devel/libinotify)

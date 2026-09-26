@@ -1,3 +1,13 @@
+# dwm-c9-freebsd
+
+This detached fork is being adapted to **FreeBSD 15.1 amd64 and X11**.
+Start with [the FreeBSD build instructions and port status](docs/FREEBSD.md).
+The initial core changes are preparatory and have not yet been tested on a
+FreeBSD host. The inherited desktop installer and system providers are unported.
+
+The content below describes the historical upstream Fedora desktop, not a
+working FreeBSD release. Follow the FreeBSD instructions above for this fork.
+
 <div align="center">
   <img alt="dwm-titus logo" src="./branding/anaconda/usr/share/anaconda/pixmaps/ctt-logo.png" />
   <p><strong>A fast, focused Fedora X11 desktop built for keyboard-driven work.</strong></p>

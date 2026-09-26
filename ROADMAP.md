@@ -1,4 +1,17 @@
-# Fedora 0.7.2 Roadmap
+# FreeBSD migration roadmap
+
+The FreeBSD 15.1 migration supersedes the inherited release plan below.
+
+1. Core build and native process interfaces; validate in a FreeBSD VM.
+2. Reduced dependency profiles and removal of unwanted optional integrations.
+3. Native installer and X11 session lifecycle, preserving user configuration.
+4. Quickshell system-provider adaptation and hardware validation.
+5. Native update/recovery design, CI, documentation and release qualification.
+
+See [FREEBSD.md](docs/FREEBSD.md) for the current code and test boundary.
+No milestone is complete until its native acceptance checks pass.
+
+## Historical Fedora 0.7.2 plan
 
 ## Current scope
 

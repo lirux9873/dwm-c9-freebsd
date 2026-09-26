@@ -1,5 +1,24 @@
 # dwm-titus Project Specification
 
+## FreeBSD migration contract (supersedes the inherited specification)
+
+The product in this detached repository is dwm-c9-freebsd, targeting FreeBSD
+15.1 amd64 and X11. The following Fedora specification records inherited
+behavior; it is not a statement of current support, authorization, or completed
+FreeBSD work. `docs/FREEBSD.md` records the actual implementation and evidence.
+
+The migration preserves tiling, tags, focus, X11/EWMH integration and editable
+TOML configuration. It replaces Linux process/filesystem/service assumptions
+with native interfaces, uses pkg packages and the base Clang compiler, and
+preserves user files and explicit privilege boundaries. The selected dependency
+scope follows the owner's reduced desktop requirements from the earlier audit.
+
+Milestone 1 supplies core process queries and build integration. Native process
+tests, a clean FreeBSD 15.1 build, and actual X11 behavior remain acceptance
+requirements. No native support claim is made until those checks pass. Existing
+Fedora service helpers, installer, image pipeline and QML system providers are
+unported and must not be treated as working FreeBSD components.
+
 ## 1. Product Definition
 
 dwm-titus is a Fedora-only desktop environment for X11. It combines a small,

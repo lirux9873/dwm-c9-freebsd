@@ -6,6 +6,17 @@ versions from `config.mk`.
 
 ## [Unreleased]
 
+### FreeBSD core preparation
+
+- Add FreeBSD sysctl process queries and executable-path discovery, and enable
+  XCB RES local-client PID lookup for the terminal-swallowing path.
+- Select native library paths and libinotify when building with GNU make on
+  FreeBSD; retain the native BSD declarations needed by the process API.
+- Restrict status-process lookup to the current user/session on FreeBSD and
+  report application spawn failures.
+- Block the inherited desktop installation target on FreeBSD and add a native
+  core-build/process test gate. No FreeBSD runtime qualification is claimed.
+
 ## [0.7.2] - 2026-09-24
 
 ### Added

@@ -1,5 +1,16 @@
 # Active Tasks
 
+## FreeBSD milestone 1: core preparation
+
+This is the active work; the completed Fedora task list below is historical.
+
+- [x] Inspect detached origin/main and create a focused branch.
+- [x] Implement native process queries and core build integration.
+- [x] Add a native build/process gate and document the unported boundaries.
+- [ ] Run the gate on FreeBSD 15.1 amd64.
+- [ ] Verify X11 launching, swallowing, status clicks and TOML reloads.
+- [ ] Complete native validation and review before merging as a usable port.
+
 ## Fedora 0.7.2 initial updates
 
 User authorization: implement issues #347, #344, #346 and #345 and open one
