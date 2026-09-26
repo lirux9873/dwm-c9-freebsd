@@ -13,7 +13,7 @@ working FreeBSD release. Follow the FreeBSD instructions above for this fork.
   <img alt="dwm-titus logo" src="./branding/anaconda/usr/share/anaconda/pixmaps/ctt-logo.png" />
   <p><strong>A fast, focused Fedora X11 desktop built for keyboard-driven work.</strong></p>
   <p>
-    <a href="https://dwm.christitus.com">Documentation</a> |
+    <a href="https://lirux9873.github.io/dwm-c9-freebsd">Documentation</a> |
     <a href="https://github.com/ChrisTitusTech/dwm-titus/releases/latest">Latest release</a> |
     <a href="./CHANGELOG.md">Changelog</a> |
     <a href="./CONTRIBUTING.md">Contributing</a>
@@ -55,7 +55,7 @@ Choose the path that matches your system:
 | [Existing system](#existing-system) | A Fedora installation you already use | Installs dependencies, the desktop session, and the selected feature set while preserving local configuration. |
 
 For complete requirements and installation details, see the
-[Installation Guide](https://dwm.christitus.com/install.html).
+[Installation Guide](https://lirux9873.github.io/dwm-c9-freebsd/install.html).
 
 ### Fedora ISO
 
@@ -127,7 +127,7 @@ runtime dependencies for the X11 desktop and its other managed helpers.
 
 ## Dependencies
 
-See [Desktop Dependencies](https://dwm.christitus.com/dependencies.html) for the
+See [Desktop Dependencies](https://lirux9873.github.io/dwm-c9-freebsd/dependencies.html) for the
 packages behind each desktop component, installation-profile differences, and
 build, gaming, and image-specific dependencies.
 
@@ -214,21 +214,21 @@ after changing the shipped palettes.
 Cursor theme changes in Settings take effect immediately across running X11
 applications via `dwm-cursor-reload`.
 
-See the [Configuration Guide](https://dwm.christitus.com/configuration.html)
-and [Theming Guide](https://dwm.christitus.com/theming.html) for examples and
+See the [Configuration Guide](https://lirux9873.github.io/dwm-c9-freebsd/configuration.html)
+and [Theming Guide](https://lirux9873.github.io/dwm-c9-freebsd/theming.html) for examples and
 safe customization paths.
 
 ## Documentation
 
-- [Installation](https://dwm.christitus.com/install.html)
-- [Getting Started](https://dwm.christitus.com/getting-started.html)
-- [Keybindings](https://dwm.christitus.com/keybinds.html)
-- [Configuration](https://dwm.christitus.com/configuration.html)
-- [Theming](https://dwm.christitus.com/theming.html)
-- [Control Center](https://dwm.christitus.com/control-center.html)
-- [Settings](https://dwm.christitus.com/settings.html)
-- [How dwm-titus Works](https://dwm.christitus.com/patches.html)
-- [Troubleshooting](https://dwm.christitus.com/troubleshooting.html)
+- [Installation](https://lirux9873.github.io/dwm-c9-freebsd/install.html)
+- [Getting Started](https://lirux9873.github.io/dwm-c9-freebsd/getting-started.html)
+- [Keybindings](https://lirux9873.github.io/dwm-c9-freebsd/keybinds.html)
+- [Configuration](https://lirux9873.github.io/dwm-c9-freebsd/configuration.html)
+- [Theming](https://lirux9873.github.io/dwm-c9-freebsd/theming.html)
+- [Control Center](https://lirux9873.github.io/dwm-c9-freebsd/control-center.html)
+- [Settings](https://lirux9873.github.io/dwm-c9-freebsd/settings.html)
+- [How dwm-titus Works](https://lirux9873.github.io/dwm-c9-freebsd/patches.html)
+- [Troubleshooting](https://lirux9873.github.io/dwm-c9-freebsd/troubleshooting.html)
 
 The technical guide explains the project architecture, what dwm is, and how
 the maintained enhancements fit together. You do not need to understand or
@@ -271,7 +271,7 @@ terminal with visible output and authorization prompts.
 
 You can also open **Control Center -> System Health** for a graphical overview.
 If the session does not start, run `startx` from a TTY to see its error output.
-The [Troubleshooting Guide](https://dwm.christitus.com/troubleshooting.html)
+The [Troubleshooting Guide](https://lirux9873.github.io/dwm-c9-freebsd/troubleshooting.html)
 covers common session, panel, terminal, theme, display, and NVIDIA issues.
 
 If the problem remains, [open an issue](https://github.com/ChrisTitusTech/dwm-titus/issues)

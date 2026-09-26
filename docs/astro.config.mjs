@@ -1,7 +1,8 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://dwm.christitus.com",
+  site: "https://lirux9873.github.io",
+  base: "/dwm-c9-freebsd",
   output: "static",
   build: {
     format: "file"

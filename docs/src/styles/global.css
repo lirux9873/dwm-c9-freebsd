@@ -854,3 +854,5 @@ input {
     transition-duration: 0.01ms !important;
   }
 }
+
+.migration-notice { border: 2px solid #d5a54a; padding: 1rem; margin-bottom: 2rem; border-radius: 0.5rem; }

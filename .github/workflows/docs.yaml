@@ -7,6 +7,11 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/docs.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yaml"
   workflow_dispatch:
 
 permissions:
@@ -34,7 +39,7 @@ jobs:
           node-version: 24
 
   deploy:
-    if: github.event_name != 'pull_request' && github.repository == 'ChrisTitusTech/dwm-titus'
+    if: github.event_name != 'pull_request' && github.repository == 'lirux9873/dwm-c9-freebsd' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

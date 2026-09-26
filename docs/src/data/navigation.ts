@@ -1,5 +1,6 @@
 export const navigation = [
-  { href: "/install.html", label: "Installation", index: "01", group: "Start" },
+  { href: "/documentation.html", label: "Editing these docs", index: "00", group: "Project" },
+  { href: "/install.html", label: "FreeBSD guide", index: "01", group: "Start" },
   { href: "/dependencies.html", label: "Dependencies", index: "02", group: "Start" },
   { href: "/getting-started.html", label: "Getting Started", index: "03", group: "Start" },
   { href: "/development-progress.html", label: "Development Progress", index: "04", group: "Project" },
@@ -13,6 +14,6 @@ export const navigation = [
 ] as const;
 
 export const projectLinks = [
-  { href: "https://github.com/ChrisTitusTech/dwm-titus", label: "GitHub" },
-  { href: "https://github.com/ChrisTitusTech/dwm-titus/releases/latest", label: "Latest release" }
+  { href: "https://github.com/lirux9873/dwm-c9-freebsd", label: "GitHub" },
+  { href: "https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-CI-REVIEW.md", label: "Native CI evidence" }
 ] as const;

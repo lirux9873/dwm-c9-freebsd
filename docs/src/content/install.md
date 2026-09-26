@@ -12,7 +12,7 @@ eyebrow: Start here
 
 ## Dependencies
 
-See [Desktop Dependencies](/dependencies.html) for a component-by-component
+See [Desktop Dependencies](/dwm-c9-freebsd/dependencies.html) for a component-by-component
 breakdown of the window manager, shell, services, applications, build tools,
 and the differences between installation profiles and image variants.
 
@@ -108,7 +108,7 @@ run:
 install-herdr
 ```
 
-![The dwm-titus applications menu in Linutil](/images/linutil-applications.png)
+![The dwm-titus applications menu in Linutil](/dwm-c9-freebsd/images/linutil-applications.png)
 
 ## Manual Install
 
