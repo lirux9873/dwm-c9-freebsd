@@ -58,6 +58,9 @@
 #include "drw.h"
 #include "util.h"
 #include "tomlparser.h"
+#ifdef __FreeBSD__
+#include "freebsd-process.h"
+#endif
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
@@ -380,6 +383,9 @@ static char stext[256];
 static int statusw;
 static int statussig;
 static pid_t statuspid = -1;
+#ifdef __FreeBSD__
+static pid_t autostart_session = -1;
+#endif
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
@@ -1655,6 +1661,9 @@ geticonprop(Window win, unsigned int *picw, unsigned int *pich)
 pid_t
 getparentprocess(pid_t p)
 {
+#ifdef __FreeBSD__
+	return freebsd_parent_pid(p);
+#else
 	unsigned int v = 0;
 
 #ifdef __linux__
@@ -1683,11 +1692,52 @@ getparentprocess(pid_t p)
 #endif /* __OpenBSD__ */
 
 	return (pid_t)v;
+#endif
 }
 
 pid_t
 getstatusbarpid()
 {
+#ifdef __FreeBSD__
+	char command[128], line[32], sessions[48];
+	char *end;
+	long candidate;
+	int written;
+	FILE *fp;
+	pid_t session = getsid(0);
+
+	if (session == -1)
+		return -1;
+	if (freebsd_process_matches(statuspid, getuid(), session, STATUSBAR)
+	    || (autostart_session > 0
+	        && freebsd_process_matches(statuspid, getuid(), autostart_session, STATUSBAR)))
+		return statuspid;
+	if (autostart_session > 0)
+		snprintf(sessions, sizeof(sessions), "%ld,%ld", (long)session, (long)autostart_session);
+	else
+		snprintf(sessions, sizeof(sessions), "%ld", (long)session);
+	written = snprintf(command, sizeof(command), "pgrep -U %lu -s %s -x %s",
+	                   (unsigned long)getuid(), sessions, STATUSBAR);
+	if (written < 0 || (size_t)written >= sizeof(command))
+		return -1;
+	if (!(fp = popen(command, "r")))
+		return -1;
+	statuspid = -1;
+	while (fgets(line, sizeof(line), fp)) {
+		errno = 0;
+		candidate = strtol(line, &end, 10);
+		if (!errno && candidate > 0 && candidate <= INT_MAX
+		    && (*end == '\n' || *end == '\0')
+		    && (freebsd_process_matches((pid_t)candidate, getuid(), session, STATUSBAR)
+		        || (autostart_session > 0
+		            && freebsd_process_matches((pid_t)candidate, getuid(), autostart_session, STATUSBAR)))) {
+			statuspid = (pid_t)candidate;
+			break;
+		}
+	}
+	pclose(fp);
+	return statuspid;
+#else
 	char buf[32], *str = buf, *c;
 	FILE *fp;
 
@@ -1707,6 +1757,7 @@ getstatusbarpid()
 	fgets(buf, sizeof(buf), fp);
 	pclose(fp);
 	return strtol(buf, NULL, 10);
+#endif
 }
 
 int
@@ -2876,7 +2927,12 @@ runautoscript(const char *script)
 void
 runautostart(void)
 {
+#ifdef __FreeBSD__
+	/* runautoscript creates a new session before starting the script. */
+	autostart_session = runautoscript(autostartsh);
+#else
 	runautoscript(autostartsh);
+#endif
 }
 
 void
@@ -4360,11 +4416,16 @@ spawn(const Arg *arg)
 	size_t argc = 0;
 	ssize_t launcherlen;
 	int status;
+	pid_t child;
 
 	while (command[argc])
 		argc++;
 	wrapped = ecalloc(argc + 2, sizeof(*wrapped));
+#ifdef __FreeBSD__
+	launcherlen = freebsd_executable_path(launcher, sizeof launcher);
+#else
 	launcherlen = readlink("/proc/self/exe", launcher, sizeof launcher);
+#endif
 	if (launcherlen <= 0 || (size_t)launcherlen >= sizeof launcher)
 		goto fallback;
 	launcher[launcherlen] = '\0';
@@ -4374,7 +4435,7 @@ spawn(const Arg *arg)
 	memcpy(separator, "/dwm-session-launch", sizeof "/dwm-session-launch");
 	wrapped[0] = launcher;
 	memcpy(wrapped + 1, command, (argc + 1) * sizeof(*command));
-	status = posix_spawn(NULL, wrapped[0], NULL, NULL, wrapped, environ);
+	status = posix_spawn(&child, wrapped[0], NULL, NULL, wrapped, environ);
 	if (status == 0) {
 		free(wrapped);
 		return;
@@ -4382,7 +4443,9 @@ spawn(const Arg *arg)
 
 fallback:
 	free(wrapped);
-	posix_spawnp(NULL, command[0], NULL, NULL, command, environ);
+	status = posix_spawnp(&child, command[0], NULL, NULL, command, environ);
+	if (status != 0)
+		fprintf(stderr, "dwm: cannot launch %s: %s\n", command[0], strerror(status));
 }
 
 void
@@ -5426,7 +5489,7 @@ winpid(Window w)
 {
 	pid_t result = 0;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 	xcb_res_client_id_spec_t spec = {0};
 	spec.client = w;
 	spec.mask = XCB_RES_CLIENT_ID_MASK_LOCAL_CLIENT_PID;
@@ -5435,13 +5498,16 @@ winpid(Window w)
 	xcb_res_query_client_ids_cookie_t c = xcb_res_query_client_ids(xcon, 1, &spec);
 	xcb_res_query_client_ids_reply_t *r = xcb_res_query_client_ids_reply(xcon, c, &e);
 
-	if (!r)
+	if (!r) {
+		free(e);
 		return (pid_t)0;
+	}
 
 	xcb_res_client_id_value_iterator_t i = xcb_res_query_client_ids_ids_iterator(r);
 	for (; i.rem; xcb_res_client_id_value_next(&i)) {
 		spec = i.data->spec;
-		if (spec.mask & XCB_RES_CLIENT_ID_MASK_LOCAL_CLIENT_PID) {
+		if ((spec.mask & XCB_RES_CLIENT_ID_MASK_LOCAL_CLIENT_PID)
+		    && xcb_res_client_id_value_value_length(i.data) > 0) {
 			uint32_t *t = xcb_res_client_id_value_value(i.data);
 			result = *t;
 			break;
@@ -5449,6 +5515,7 @@ winpid(Window w)
 	}
 
 	free(r);
+	free(e);
 
 	if (result == (pid_t)-1)
 		result = 0;

@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## FreeBSD fork direction (2026-09-26)
+
+This detached repository is now `lirux9873/dwm-c9-freebsd`. The target is
+FreeBSD 15.1 amd64 with X11. The owner's migration request supersedes the
+inherited Fedora-only product, packaging and validation requirements below.
+The inherited text remains reference material until its subsystem is migrated.
+Do not apply its old issue authorizations or release status to this fork.
+
+Read `docs/FREEBSD.md` for current implementation boundaries. Native build and
+process validation uses `sh tests/test-freebsd-core.sh`; the inherited GNU/Linux
+test runner is not a FreeBSD gate. A passing source review or Linux build must
+not be represented as FreeBSD runtime validation. Preserve the existing Git
+review discipline and all user-configuration and privilege boundaries.
+
+The initial change set is core portability only. Desktop service providers,
+native installation, removal of unwanted optional integrations and release
+automation are later migration milestones. Do not activate inherited system
+installers, repository additions, image builders or self-updaters on FreeBSD.
+
 ## Purpose
 
 This repository is a Fedora-only X11 desktop environment built around a
