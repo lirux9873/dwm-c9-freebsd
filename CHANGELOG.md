@@ -1,5 +1,9 @@
 # Changelog
 
+- Add experimental FreeBSD 15.1 amd64 system-filesystem and installer-ISO
+  builders for the minimal native X11/dwm profile, with checksum manifests and
+  interactive Distribution Sets installation. Boot/install qualification is pending.
+
 - Publish the FreeBSD guide and Astro documentation on the fork's GitHub Pages site, with repository-prefixed links and labeled inherited references.
 
 All notable project changes are documented here. This project follows
