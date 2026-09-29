@@ -4,6 +4,8 @@ Repository: [lirux9873/dwm-c9-freebsd](https://github.com/lirux9873/dwm-c9-freeb
 Initial baseline: `e5bbddc0c7261951d351d9a7c502a9952fc0b624`.
 Target: FreeBSD 15.1-RELEASE amd64, X11, native applications.
 
+A usable native Quickshell profile is now available: [start or install the desktop](https://lirux9873.github.io/dwm-c9-freebsd/desktop.html).
+
 This is a port in progress. The first change set addresses the C window manager
 and its build dependencies. The inherited full desktop installer, session
 helpers, QML system providers and Fedora image pipeline are not a FreeBSD port.

@@ -168,6 +168,7 @@ make_qmldir_for_module() {
 
 qmllint=$(find_qmllint)
 project_root=$(find_root)
+project_root=$(CDPATH= cd -- "$project_root" && pwd -P)
 
 if [ -z "$files" ]; then
 	files=$(find "$project_root" -type f -name '*.qml' | sort)
@@ -185,7 +186,7 @@ imports=$(
 	printf '%s\n' "$files" |
 		while IFS= read -r file; do
 			[ -f "$file" ] || continue
-			sed -n 's/^[[:space:]]*import[[:space:]]\+\(qs\(\.[A-Za-z0-9_]\+\)*\)\([[:space:]].*\)\{0,1\}$/\1/p' "$file"
+			awk '$1 == "import" && $2 ~ /^qs(\.[A-Za-z0-9_]+)*$/ { print $2 }' "$file"
 		done |
 		sort -u
 )

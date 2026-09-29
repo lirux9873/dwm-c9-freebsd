@@ -11,6 +11,7 @@ profile name to list packages, without installing or changing anything:
 | runtime | Minimal Xorg, xterm, D-Bus and fonts |
 | test | Build profile plus Python, Xvfb, xdotool, xprop, terminal and fonts |
 | image | Build + runtime + Git for subsequent regular-user development |
+| desktop | Build + runtime + quickshell, python3, bash, xdotool, xprop and glib |
 | host | Build + Git + Python for a development checkout |
 
 FreeBSD base supplies cc, sh, tar and core system tools. No Linux ABI packages
@@ -47,16 +48,16 @@ host. No packages need uninstalling from the working test VM for this cleanup.
 
 | Component | Remaining platform work |
 | --- | --- |
-| Quickshell panel/settings | Native package/API compatibility and end-to-end QML session validation |
-| Audio | Replace ALSA/PipeWire-specific helper assumptions with supported native controls |
+| Quickshell | Native panel/launcher/notifications tested; full inherited Settings remains unported |
+| Audio | Native mixer volume/mute implemented; audible output needs hardware validation |
 | Networking and Bluetooth | Replace NetworkManager/BlueZ integration with reviewed FreeBSD providers |
 | Power, lock and brightness | Replace logind/systemd service and device assumptions |
 | Updates and system management | Replace DNF/RPM/PackageKit paths and privileged helpers |
-| General installation | Native rc/session lifecycle, configuration preservation and display-manager support |
+| General installation | User-directory installer/startx implemented; system-wide/display-manager integration remains |
 
 These are not advertised as supported dependencies merely because a similarly
 named FreeBSD package exists. Their native interfaces must be implemented and
-tested before adding a full desktop profile.
+tested before expanding the supported native desktop profile.
 
 The excluded optional integrations have been removed from active helpers,
 install paths, defaults and site guides. Historical release evidence and

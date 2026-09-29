@@ -1,19 +1,18 @@
 # Active FreeBSD tasks
 
-## Next milestone: native installation and session lifecycle
+The native Quickshell profile is implemented and tested on FreeBSD 15.1/Xvfb:
+user installation, repeat installation, preserved configuration, rollback,
+panel/workspaces, launcher, notifications, terminal and native system controls.
+See docs/FREEBSD-DESKTOP.md and docs/FREEBSD-QUICKSHELL-REVIEW.md.
 
-The minimal desktop passed owner testing on UEFI/ZFS. Native package profiles
-and excluded integration cleanup are implemented; see
-[cleanup validation](docs/FREEBSD-DEPENDENCY-REVIEW.md).
-The full desktop remains unported.
+## Remaining qualification and optional services
 
-- [ ] Inventory startup/helper commands and select the next native session scope.
-- [x] Port application-launch metadata checks and locking; validate native launcher tests.
-- [ ] Port remaining session lifecycle helpers and the theme writer.
-- [ ] Add a config-preserving native installer/uninstaller for existing systems.
-- [ ] Validate native desktop-file paths, fonts and display-manager/startx entry.
-- [ ] Test installation, repeat installation and rollback on the snapshot VM.
-- [ ] Close core gaps: swallowing, status clicks and save/rename hot reloads.
+- [ ] Owner console validation of the installed Quickshell session.
+- [ ] Audible audio output, laptop battery and physical GPU checks.
+- [ ] Multimonitor panel behavior and display-manager integration.
+- [ ] Native Wi-Fi editing, Bluetooth, brightness, locking and power actions.
+- [ ] Full inherited Settings/theme-writer migration and package updates.
+- [ ] End-to-end swallowing and remaining core hot-reload coverage.
 
-Quickshell service providers and updates/recovery follow this milestone.
+These are not claimed as completed by the usable native profile.
 Historical Fedora issue authorizations do not govern this fork.

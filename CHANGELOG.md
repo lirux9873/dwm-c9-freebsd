@@ -1,5 +1,9 @@
 # Changelog
 
+- Add a native FreeBSD Quickshell desktop with panel, launcher, notifications,
+  workspace state and mixer/system controls. Provide a user-directory installer
+  with preserved settings, versioned releases and rollback.
+
 - Add an isolated native desktop preview with themed terminals, a live system
   dashboard, monitor and tiling shortcuts, using the installed minimal dwm.
 

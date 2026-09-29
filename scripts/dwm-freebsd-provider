@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""Small native desktop provider. Never runs a shell or escalates privileges."""
+import json
+import os
+import re
+import subprocess
+import sys
+
+
+def output(*args):
+    result = subprocess.run(args, capture_output=True, text=True, timeout=4)
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "Command failed: " + args[0])
+    return result.stdout.strip()
+
+
+def snapshot():
+    state = {"hostname": os.uname().nodename, "load": round(os.getloadavg()[0], 2),
+             "volume": None, "muted": False, "network": [], "battery": None}
+    try:
+        mixer = output("/usr/sbin/mixer", "-o", "vol")
+        match = re.search(r"vol.volume=([0-9.]+):([0-9.]+)", mixer)
+        if match:
+            state["volume"] = round(100 * (float(match[1]) + float(match[2])) / 2)
+        state["muted"] = "vol.mute=on" in mixer
+    except (OSError, RuntimeError, subprocess.TimeoutExpired):
+        pass
+    try:
+        interface = ""
+        for line in output("/sbin/ifconfig", "-u").splitlines():
+            if line and not line[0].isspace():
+                interface = line.split(":", 1)[0]
+            match = re.match(r"\s+inet ([0-9.]+) ", line)
+            if match and interface != "lo0":
+                state["network"].append(interface + " " + match[1])
+    except (OSError, RuntimeError, subprocess.TimeoutExpired):
+        pass
+    try:
+        battery = int(output("/sbin/sysctl", "-n", "hw.acpi.battery.life"))
+        if 0 <= battery <= 100:
+            state["battery"] = battery
+    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired):
+        pass
+    return state
+
+
+def main():
+    if sys.platform != "freebsd" and not sys.platform.startswith("freebsd"):
+        raise RuntimeError("Requires native FreeBSD")
+    action = sys.argv[1:]
+    if action == ["snapshot"]:
+        pass
+    elif len(action) == 2 and action[0] == "volume" and action[1].isdigit() and 0 <= int(action[1]) <= 100:
+        output("/usr/sbin/mixer", "vol.volume=" + action[1] + "%")
+    elif action == ["mute"]:
+        output("/usr/sbin/mixer", "vol.mute=toggle")
+    else:
+        raise ValueError("Usage: dwm-freebsd-provider snapshot|volume 0..100|mute")
+    print(json.dumps(snapshot()))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+        print(str(error), file=sys.stderr)
+        sys.exit(1)

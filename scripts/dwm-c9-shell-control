@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+case ${1:-} in launcher|controls|notifications) ;; *) exit 2 ;; esac
+exec quickshell ipc --path "${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/shell.qml" call desktop "$1"

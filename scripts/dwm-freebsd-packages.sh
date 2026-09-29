@@ -14,6 +14,11 @@ packages() {
         packages build
         printf '%s\n' python3 xorg-vfbserver xterm xdotool xprop noto-sans-mono noto-emoji
         ;;
+    desktop)
+        packages build
+        packages runtime
+        printf '%s\n' quickshell python3 bash xdotool xprop glib
+        ;;
     image)
         packages build
         packages runtime
@@ -27,7 +32,7 @@ packages() {
     esac
 }
 if [ "$#" -ne 1 ]; then
-    printf 'Usage: %s build|runtime|test|image|host\n' "$0" >&2
+    printf 'Usage: %s build|runtime|test|image|host|desktop\n' "$0" >&2
     exit 2
 fi
 # Capture before sorting so an invalid profile cannot be masked by a pipeline.
