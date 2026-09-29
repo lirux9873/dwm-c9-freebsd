@@ -1,5 +1,9 @@
 # Changelog
 
+- Fix FreeBSD 15.1 pkgbase disc1 support: verify the customized base against
+  the ISO MANIFEST and accept a checksum-verified `--kernel` distribution.
+  Previously built system archives can be reused without rebuilding them.
+
 - Add experimental FreeBSD 15.1 amd64 system-filesystem and installer-ISO
   builders for the minimal native X11/dwm profile, with checksum manifests and
   interactive Distribution Sets installation. Boot/install qualification is pending.
