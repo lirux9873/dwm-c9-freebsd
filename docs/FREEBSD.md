@@ -34,6 +34,12 @@ matching save/rename hot-reload behavior must be tested either way.
 
 ## Prepare a FreeBSD test host
 
+For the complete sequence, including completed steps, Windows SSH access and
+the next regular-user test, follow [Test VM setup](https://lirux9873.github.io/dwm-c9-freebsd/test-host.html).
+Our current custom-ISO VM already has the build dependencies and Git installed;
+its SSH key access is verified. Continue with the regular-user checkout and
+core gate rather than reinstalling the VM.
+
 For experimental installation media with a minimal native X11/dwm session, see
 [the FreeBSD image builders](https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-IMAGES.md).
 These builders require a disposable FreeBSD VM. Owner-reported UEFI/ZFS

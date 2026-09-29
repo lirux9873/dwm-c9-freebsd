@@ -1,5 +1,8 @@
 # Changelog
 
+- Document the verified test-VM setup, Windows SSH key connection and pending
+  regular-user build gate; add a dedicated Test VM setup documentation page.
+
 - Record owner-reported UEFI/ZFS minimal desktop validation and refresh the
   migration roadmap, with native dependency cleanup next.
 
