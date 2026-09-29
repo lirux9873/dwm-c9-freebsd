@@ -1,7 +1,7 @@
 # Experimental FreeBSD 15.1 image builders
 
 These builders target **FreeBSD 15.1-RELEASE amd64**, with a minimal native Xorg,
-dwm, xterm and D-Bus session. They do not install the unported Quickshell desktop,
+dwm, xterm and D-Bus session. They do not include the separately installed native Quickshell desktop,
 Linux service helpers, optional application stores or gaming integrations.
 They are development tools, not qualified release images.
 
@@ -121,6 +121,12 @@ in the user's persistent XDG data directory. The session refuses to start if
 inherited autostart/autostop/theme-apply helpers are present, leaving those files untouched.
 It does not install a display manager, configure GPU drivers, enable automatic
 login or replace a user's `.xinitrc`.
+
+## Continue to the Quickshell desktop
+
+Once the minimal session works, follow the [step-by-step native desktop guide](https://lirux9873.github.io/dwm-c9-freebsd/desktop.html)
+to clone the source, install native packages and build the user-owned Quickshell
+session. No second ISO build is required.
 
 ## Validation boundary
 

@@ -45,7 +45,8 @@ Xterm XIO messages occur when the test X server shuts down after logout.
 
 Built-in Codex CLI review cannot locate its home directory on Windows;
 independent source review was used. ShellCheck/shfmt unavailable.
-Physical VirtualBox console launch, third-party tray apps, audible sound,
+The owner subsequently confirmed the VirtualBox console session works.
+Third-party tray apps, audible sound,
 laptop power devices and multiple monitors are not validated. No fresh ISO,
 Linux runtime suite, privileged updater or full inherited Settings was tested.
 
