@@ -1,5 +1,8 @@
 # Changelog
 
+- Record owner-reported UEFI/ZFS minimal desktop validation and refresh the
+  migration roadmap, with native dependency cleanup next.
+
 - Fix FreeBSD 15.1 pkgbase disc1 support: verify the customized base against
   the ISO MANIFEST and accept a checksum-verified `--kernel` distribution.
   Previously built system archives can be reused without rebuilding them.

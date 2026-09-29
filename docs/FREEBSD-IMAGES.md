@@ -128,10 +128,10 @@ Portable tests cover checksum/provenance rejection, distribution-manifest
 updates, exclusive output publication, host rejection and failed-workspace
 retention. Run `python3 tests/test-freebsd-image-builders.py`.
 
-Native chroot package installation, complete image creation, BIOS/UEFI boot,
-interactive UFS/ZFS installation, installed X11 startup and physical hardware
-have **not yet been qualified**. A passing existing core smoke test does not
-validate these new image builders. Before publishing release artifacts, record
+The owner reports successful image creation, UEFI/ZFS VM installation, basic
+X11/dwm keyboard checks and startup after reboot. See
+[manual VM evidence](FREEBSD-VM-VALIDATION.md) for scope and missing identifiers.
+BIOS, UFS and physical hardware remain unverified. Before release qualification, record
 both firmware boot/install results, output SHA256 values, package manifest,
 normal-user terminal/tag/logout tests and source-tree revision.
 

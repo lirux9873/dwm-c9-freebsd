@@ -36,8 +36,9 @@ matching save/rename hot-reload behavior must be tested either way.
 
 For experimental installation media with a minimal native X11/dwm session, see
 [the FreeBSD image builders](https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-IMAGES.md).
-These new builders require a disposable FreeBSD VM and are not yet boot/install
-qualified. They do not use the inherited Fedora installer.
+These builders require a disposable FreeBSD VM. Owner-reported UEFI/ZFS
+installation tests pass; full release qualification remains pending. They do
+not use the inherited Fedora installer.
 
 Install a FreeBSD 15.1 VM or machine before treating this as a usable desktop.
 As root, install the build dependencies:
@@ -82,8 +83,8 @@ assumptions. With no adjacent launcher helper, dwm launches applications directl
 
 ## Remaining migration work
 
-1. Validate this core on FreeBSD 15.1: process tests, clean build, X11 launch,
-   terminal spawning/swallowing, tags, focus, hot-reload saves/renames and logout.
+1. Finish core runtime validation: swallowing, status clicks, focus and
+   hot-reload saves/renames. Native build/process/basic X11 tests already pass.
 2. Replace the inherited dependency/installation profiles with the reduced
    native package scope. Remove unwanted optional integrations from helpers,
    defaults, settings, tests and documentation, including their UI actions.
@@ -101,6 +102,12 @@ scope. They are not reintroduced by this core change. Their inherited source
 still needs the repository-wide cleanup in milestone 2.
 
 ## Validation status
+
+The owner reports successful custom ISO creation, UEFI/ZFS VM installation,
+terminal/tag/close/logout checks and dwm startup after reboot. See
+[manual VM evidence](https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-VM-VALIDATION.md).
+This validates the minimal session, not the complete desktop.
+
 
 The `Desktop smoke` Actions job now boots a FreeBSD 15.1 amd64 VM with the
 pinned `vmactions/freebsd-vm` action. GitHub's Ubuntu host only orchestrates the
