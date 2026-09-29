@@ -1,11 +1,73 @@
 [active]
-theme = "preview"
+theme = "nord"
+
 [appearance]
 borderpx = 3
-[theme.preview]
-normfgcolor = "#c4cfdf"
-normbgcolor = "#18212f"
-normbordercolor = "#29384d"
-selfgcolor = "#101820"
-selbgcolor = "#72d6c9"
-selbordercolor = "#72d6c9"
+
+[theme.nord]
+normfgcolor = "#D8DEE9"
+normbgcolor = "#434C5E"
+normbordercolor = "#3B4252"
+selfgcolor = "#ECEFF4"
+selbgcolor = "#434C5E"
+selbordercolor = "#81A1C1"
+term_bg = "#2E3440"
+term_fg = "#D8DEE9"
+term_cursor = "#81A1C1"
+term_color1 = "#BF616A"
+term_color2 = "#A3BE8C"
+term_color3 = "#EBCB8B"
+term_color6 = "#88C0D0"
+term_color8 = "#4C566A"
+dark_mode = true
+
+[theme.dracula]
+normfgcolor = "#F8F8F2"
+normbgcolor = "#282A36"
+normbordercolor = "#44475A"
+selfgcolor = "#F8F8F2"
+selbgcolor = "#44475A"
+selbordercolor = "#BD93F9"
+term_bg = "#282A36"
+term_fg = "#F8F8F2"
+term_cursor = "#F8F8F2"
+term_color1 = "#FF5555"
+term_color2 = "#50FA7B"
+term_color3 = "#F1FA8C"
+term_color6 = "#8BE9FD"
+term_color8 = "#6272A4"
+dark_mode = true
+
+[theme.gruvbox]
+normfgcolor = "#EBDBB2"
+normbgcolor = "#3C3836"
+normbordercolor = "#504945"
+selfgcolor = "#FBF1C7"
+selbgcolor = "#504945"
+selbordercolor = "#D79921"
+term_bg = "#282828"
+term_fg = "#EBDBB2"
+term_cursor = "#D79921"
+term_color1 = "#CC241D"
+term_color2 = "#98971A"
+term_color3 = "#D79921"
+term_color6 = "#689D6A"
+term_color8 = "#928374"
+dark_mode = true
+
+[theme.tokyonight]
+normfgcolor = "#C0CAF5"
+normbgcolor = "#1F2335"
+normbordercolor = "#3B4261"
+selfgcolor = "#C0CAF5"
+selbgcolor = "#292E42"
+selbordercolor = "#7AA2F7"
+term_bg = "#1A1B26"
+term_fg = "#C0CAF5"
+term_cursor = "#C0CAF5"
+term_color1 = "#F7768E"
+term_color2 = "#9ECE6A"
+term_color3 = "#E0AF68"
+term_color6 = "#7DCFFF"
+term_color8 = "#565F89"
+dark_mode = true

@@ -11,7 +11,19 @@ import tempfile
 
 REPO = Path(__file__).resolve().parents[1]
 CORE = "Makefile config.mk config.def.h dwm.c drw.c drw.h util.c util.h tomlparser.c tomlparser.h freebsd-process.c freebsd-process.h".split()
-HELPERS = "dwm-c9-terminal dwm-freebsd-session dwm-freebsd-provider dwm-c9-shell-control dwm-quickshell-state dwm-quickshell-launcher dwm-session-launch dwm-terminal".split()
+HELPERS = "dwm-c9-terminal dwm-freebsd-appearance dwm-freebsd-session dwm-freebsd-provider dwm-c9-shell-control dwm-quickshell-state dwm-quickshell-launcher dwm-session-launch dwm-terminal".split()
+LEGACY_NATIVE_THEMES = '''[active]
+theme = "preview"
+[appearance]
+borderpx = 3
+[theme.preview]
+normfgcolor = "#c4cfdf"
+normbgcolor = "#18212f"
+normbordercolor = "#29384d"
+selfgcolor = "#101820"
+selbgcolor = "#72d6c9"
+selbordercolor = "#72d6c9"
+'''
 
 
 def install(prefix):
@@ -20,7 +32,7 @@ def install(prefix):
     version = subprocess.check_output(["freebsd-version", "-u"], text=True).strip()
     if not version.startswith("15.1-RELEASE"):
         raise RuntimeError("Requires FreeBSD 15.1-RELEASE")
-    for command in ("gmake", "cc", "quickshell", "xterm", "xprop", "xdotool", "dbus-run-session", "bash", "xsetroot"):
+    for command in ("gmake", "cc", "quickshell", "xterm", "xprop", "xdotool", "dbus-run-session", "bash", "xsetroot", "feh"):
         if not shutil.which(command):
             raise RuntimeError("Missing dependency: " + command)
     prefix = prefix.expanduser().absolute()
@@ -64,6 +76,11 @@ def install(prefix):
         target = config / "dwm-titus" / name
         if not os.path.lexists(target):
             shutil.copyfile(REPO / "config/freebsd" / name, target)
+    # Replace only the exact, previously generated one-theme file. Any edit,
+    # symlink, or other existing theme configuration remains user-owned.
+    themes = config / "dwm-titus/themes.toml"
+    if themes.is_file() and not themes.is_symlink() and themes.read_text() == LEGACY_NATIVE_THEMES:
+        shutil.copyfile(REPO / "config/freebsd/themes.toml", themes)
     if not qml_link.is_symlink():
         qml_link.symlink_to(prefix / "current/quickshell")
     current = prefix / "current"

@@ -10,6 +10,8 @@ config.h
 
 # Object Files
 *.o
+__pycache__/
+*.pyc
 .env
 nohup.out
 .DS_STORE

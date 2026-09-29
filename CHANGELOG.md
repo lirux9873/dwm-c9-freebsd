@@ -1,5 +1,8 @@
 # Changelog
 
+- Add live Nord, Dracula, Gruvbox and Tokyo Night themes to the native desktop,
+  plus persistent wallpaper selection through FreeBSD's native feh package.
+
 - Expand the native desktop guide into a complete custom-ISO-to-Quickshell
   rebuild sequence; record successful owner console validation.
 

@@ -30,6 +30,10 @@ with tempfile.TemporaryDirectory(prefix="c9-install-test-") as directory:
     installer.rollback(prefix)
     assert (prefix / "current").resolve() == first
     assert theme.read_text() == custom
+    theme.write_text(installer.LEGACY_NATIVE_THEMES)
+    installer.install(prefix)
+    assert 'theme = "nord"' in theme.read_text()
+    assert "[theme.dracula]" in theme.read_text()
     unmanaged = root / "unmanaged"
     unmanaged.mkdir()
     try:

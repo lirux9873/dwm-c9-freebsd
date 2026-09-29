@@ -8,6 +8,7 @@ See docs/FREEBSD-DESKTOP.md and docs/FREEBSD-QUICKSHELL-REVIEW.md.
 ## Remaining qualification and optional services
 
 - [x] Owner confirmed the installed Quickshell session works in VirtualBox.
+- [x] Native live themes and persistent feh wallpaper selection.
 - [ ] Audible audio output, laptop battery and physical GPU checks.
 - [ ] Multimonitor panel behavior and display-manager integration.
 - [ ] Native Wi-Fi editing, Bluetooth, brightness, locking and power actions.
