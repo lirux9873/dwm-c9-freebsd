@@ -1,5 +1,8 @@
 # Changelog
 
+- Expand the native desktop guide into a complete custom-ISO-to-Quickshell
+  rebuild sequence; record successful owner console validation.
+
 - Add a native FreeBSD Quickshell desktop with panel, launcher, notifications,
   workspace state and mixer/system controls. Provide a user-directory installer
   with preserved settings, versioned releases and rollback.
