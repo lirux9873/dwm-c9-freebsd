@@ -34,6 +34,11 @@ matching save/rename hot-reload behavior must be tested either way.
 
 ## Prepare a FreeBSD test host
 
+For experimental installation media with a minimal native X11/dwm session, see
+[the FreeBSD image builders](https://github.com/lirux9873/dwm-c9-freebsd/blob/main/docs/FREEBSD-IMAGES.md).
+These new builders require a disposable FreeBSD VM and are not yet boot/install
+qualified. They do not use the inherited Fedora installer.
+
 Install a FreeBSD 15.1 VM or machine before treating this as a usable desktop.
 As root, install the build dependencies:
 

@@ -21,6 +21,17 @@ unported and must not be treated as working FreeBSD components.
 
 ## 1. Product Definition
 
+### FreeBSD experimental image boundary
+
+The owner selected minimal X11/dwm images as the first image target. The native
+builders prepare a customized FreeBSD 15.1 amd64 base distribution and embed it
+in official disc1 media, preserving interactive Distribution Sets installation.
+They must verify source/artifact checksums, refuse existing outputs, avoid
+unattended disk selection and keep user configuration intact. Complete
+Quickshell integration is not part of this image profile. Native artifact
+creation, BIOS/UEFI boot and installed-session checks are required before
+release qualification; portable tests alone do not satisfy those requirements.
+
 dwm-titus is a Fedora-only desktop environment for X11. It combines a small,
 maintained fork of suckless dwm with runtime-configurable hotkeys, themes, and
 window rules, a managed Quickshell shell and Settings layer, and supporting
