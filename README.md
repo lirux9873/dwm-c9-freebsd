@@ -10,7 +10,7 @@ and the full inherited Settings application remain outside this profile.
 - [Test VM setup](docs/FREEBSD-TEST-HOST.md)
 - [Native package profiles](docs/FREEBSD-DEPENDENCIES.md)
 - [Image builders](docs/FREEBSD-IMAGES.md)
-- [Roadmap](ROADMAP.md) and [active tasks](TASKS.md)
+- [Roadmap](ROADMAP.md) and [prioritized open tasks](TASKS.md)
 
 ## Current validation
 
