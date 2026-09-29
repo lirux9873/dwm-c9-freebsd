@@ -134,8 +134,6 @@ Singleton {
             addIconSource(sources, "file:///usr/share/icons/Adwaita/symbolic/status/dialog-password-symbolic.svg");
             addIconSource(sources, "file:///usr/share/icons/AdwaitaLegacy/24x24/legacy/dialog-password.png");
             addIconSource(sources, "image://icon/dialog-password-symbolic");
-        } else if (iconName === "steam_tray_mono") {
-            addIconSource(sources, "file:///usr/share/pixmaps/steam_tray_mono.png");
         }
     }
 

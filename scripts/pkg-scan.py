@@ -22,8 +22,8 @@ def list_python_packages():
 
 def list_system_packages():
     managers = [
+        ("pkg", ["pkg", "query", "%n\t%v"]),
         ("rpm", ["rpm", "-qa", "--qf", "%{NAME}\t%{VERSION}\n"]),
-        ("flatpak", ["flatpak", "list", "--columns=application,version"]),
         ("snap", ["snap", "list"]),
     ]
 
@@ -36,7 +36,7 @@ def list_system_packages():
             found = True
 
     if not found:
-        print("No Fedora package database found.")
+        print("No supported package database found.")
 
 
 if __name__ == "__main__":

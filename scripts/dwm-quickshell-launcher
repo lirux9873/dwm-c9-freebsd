@@ -41,11 +41,9 @@ data_dirs() {
 	fi
 
 	if [ -n "${HOME:-}" ]; then
-		add_dir "$HOME/.local/share/flatpak/exports/share"
 		add_dir "$HOME/.local/share/snapd"
 		add_dir "$HOME/.nix-profile/share"
 	fi
-	add_dir /var/lib/flatpak/exports/share
 	add_dir /var/lib/snapd/desktop
 	add_dir /nix/var/nix/profiles/default/share
 

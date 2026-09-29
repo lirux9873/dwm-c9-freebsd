@@ -62,11 +62,11 @@ PY
 [[ -z $(find /usr/share/dwm-titus-image \( -name '.env' -o -name '.env.*' -o -name '.envrc' \) -print -quit) ]]
 missing=0
 # maim uses libslop for region selection; RPM resolves its shared dependencies.
-for command in dwm quickshell fastfetch starship herdr brave-origin celluloid mpv sxiv maim xclip xdotool xrandr xset xinput \
+for command in dwm quickshell fastfetch starship brave-origin celluloid mpv sxiv maim xclip xdotool xrandr xset xinput \
 	setxkbmap xkbset notify-send xdg-open xdg-mime xdg-user-dir \
 	picom feh dex-autostart xsettingsd light-locker light-locker-command \
-	nmcli bluetoothctl wpctl pactl playerctl brightnessctl amixer protonrestart \
-	flatpak pavucontrol thunar file-roller dconf gsettings \
+	nmcli bluetoothctl wpctl pactl playerctl brightnessctl amixer \
+	pavucontrol thunar file-roller dconf gsettings \
 	busctl systemctl loginctl pkexec jq python3 \
 	dwm-screenshot dwm-terminal dwm-default-apps dwm-lock dwm-diagnostics \
 	dwm-quickshell-launcher dwm-quickshell-controlcenter; do
@@ -84,7 +84,6 @@ for command in maim dwm; do
 		exit 1
 	fi
 done
-flatpak --system info it.mijorus.gearlever >/dev/null
 [[ $(fc-match -f '%{family}' 'MesloLGS Nerd Font Mono') == *Meslo* ]]
 [[ -n $(find /boot -maxdepth 1 -name 'vmlinuz-*' -print -quit) ]]
 [[ -x /usr/libexec/polkit-mate-authentication-agent-1 ]]

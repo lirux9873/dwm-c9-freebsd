@@ -39,12 +39,12 @@ grep -Fqx "$work/bin/alacritty" "$work/out"
 grep -Fqx -- "--class" "$work/out"
 grep -Fqx "dwm-test" "$work/out"
 
-sed -i 's/terminal = "alacritty"/terminal = "kitty"/' \
+sed -i.bak 's/terminal = "alacritty"/terminal = "kitty"/' \
 	"$XDG_CONFIG_HOME/dwm-titus/hotkeys.toml"
 DWM_TERMINAL_TEST_OUT="$work/configured-out" \
 	PATH="$work/bin" \
 	"$BASH_BIN" "$HELPER" --print-command >"$work/configured-command"
-sed -i 's/terminal = "kitty"/terminal = "dwmterm"/' \
+sed -i.bak 's/terminal = "kitty"/terminal = "dwmterm"/' \
 	"$XDG_CONFIG_HOME/dwm-titus/hotkeys.toml"
 cat >"$work/bin/dwmterm" <<'SCRIPT'
 #!/bin/sh
@@ -58,7 +58,7 @@ DWM_TERMINAL_TEST_OUT="$work/dwmterm-configured-out" \
 	"$BASH_BIN" "$HELPER" --print-command >"$work/dwmterm-configured-command"
 grep -Fqx dwmterm "$work/dwmterm-configured-command"
 rm -f "$work/bin/dwmterm"
-sed -i 's/terminal = "dwmterm"/terminal = "alacritty"/' \
+sed -i.bak 's/terminal = "dwmterm"/terminal = "alacritty"/' \
 	"$XDG_CONFIG_HOME/dwm-titus/hotkeys.toml"
 
 cat >>"$XDG_CONFIG_HOME/dwm-titus/hotkeys.toml" <<'EOF'
@@ -70,52 +70,11 @@ DWM_TERMINAL_TEST_OUT="$work/section-out" \
 	"$BASH_BIN" "$HELPER" --print-command >"$work/section-command"
 grep -Fqx alacritty "$work/section-command"
 
-cat >"$work/bin/herdr" <<'SCRIPT'
-#!/bin/sh
-exit 0
-SCRIPT
-chmod +x "$work/bin/herdr"
-
-DWM_TERMINAL_TEST_OUT="$work/default-out" \
-	PATH="$work/bin" \
-	"$BASH_BIN" "$HELPER"
-
+DWM_TERMINAL_TEST_OUT="$work/default-out" PATH="$work/bin" "$BASH_BIN" "$HELPER"
 grep -Fqx "$work/bin/alacritty" "$work/default-out"
-if grep -Fqx -- "-e" "$work/default-out"; then
-	echo "dwm-terminal launched Herdr without an explicit opt-in" >&2
-	exit 1
-fi
-
-DWM_TERMINAL_TEST_OUT="$work/herdr-out" \
-	DWM_HERDR=1 \
-	PATH="$work/bin" \
-	"$BASH_BIN" "$HELPER"
-
-grep -Fqx "$work/bin/alacritty" "$work/herdr-out"
-grep -Fqx -- "-e" "$work/herdr-out"
-grep -Fqx "$work/bin/herdr" "$work/herdr-out"
-
-DWM_TERMINAL_TEST_OUT="$work/direct-out" \
-	PATH="$work/bin" \
-	"$BASH_BIN" "$HELPER" -e sh -c "printf direct"
-
-grep -Fqx "$work/bin/alacritty" "$work/direct-out"
+DWM_TERMINAL_TEST_OUT="$work/direct-out" PATH="$work/bin" "$BASH_BIN" "$HELPER" -e sh -c "printf direct"
 grep -Fqx -- "-e" "$work/direct-out"
 grep -Fqx "sh" "$work/direct-out"
-if grep -Fqx "$work/bin/herdr" "$work/direct-out"; then
-	echo "dwm-terminal wrapped an explicit command in Herdr" >&2
-	exit 1
-fi
-
-DWM_TERMINAL_TEST_OUT="$work/disabled-out" \
-	DWM_HERDR=0 \
-	PATH="$work/bin" \
-	"$BASH_BIN" "$HELPER"
-
-if grep -Fqx -- "-e" "$work/disabled-out"; then
-	echo "dwm-terminal launched Herdr while DWM_HERDR=0" >&2
-	exit 1
-fi
 
 cat >"$work/bin/custom-term" <<'SCRIPT'
 #!/bin/sh
@@ -137,7 +96,7 @@ DWM_TERMINAL_TEST_OUT="$work/malformed-out" \
 	"$BASH_BIN" "$HELPER"
 grep -Fqx "$work/bin/alacritty" "$work/malformed-out"
 
-rm -f "$work/bin/alacritty" "$work/bin/kitty" "$work/bin/custom-term" "$work/bin/herdr"
+rm -f "$work/bin/alacritty" "$work/bin/kitty" "$work/bin/custom-term"
 
 if PATH="$work/bin" "$BASH_BIN" "$HELPER" 2>"$work/err"; then
 	echo "dwm-terminal succeeded without a terminal" >&2

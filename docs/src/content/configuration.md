@@ -135,10 +135,6 @@ Thunar's seeded **Open Terminal Here** action launches Alacritty directly in
 the selected directory, matching the normal `Super` + `X` default. Existing
 Thunar custom actions are preserved during installation and upgrades.
 
-Set `DWM_TERMINAL` to choose another emulator for `dwm-terminal`. Herdr is an
-optional layer: install it explicitly, set `DWM_HERDR=1`, and run
-`dwm-terminal`. Set `DWM_HERDR_COMMAND` to select a different Herdr binary.
-
 Default applications use freedesktop settings. Run `dwm-default-apps browsers`
 to list browser desktop files, `dwm-default-apps set-browser firefox.desktop`
 to set the default browser, or `dwm-default-apps set-mime <mime> <desktop-id>`
@@ -253,13 +249,9 @@ tag_keys = [
 
 ## Notes on XDG Autostart
 
-Recommend using Flatpak to install programs on startup:
 
-```sh
-flatpak install flathub io.github.flattool.Ignition
-```
 
-or you can create your own .desktop file in ~/.config/autostart/
+You can create your own .desktop file in ~/.config/autostart/
 
 `set-refresh.desktop` Example:
 

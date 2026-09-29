@@ -18,9 +18,6 @@ import tempfile
 
 REPO = Path(__file__).resolve().parents[1]
 RELEASE = "15.1-RELEASE"
-PACKAGES = ["gmake", "pkgconf", "libinotify", "libX11", "libXft", "libXinerama",
-            "libXrender", "libxcb", "xcb-util", "imlib2", "freetype2", "fontconfig",
-            "xorg", "xterm", "dbus", "noto-sans-mono", "noto-emoji"]
 HOTKEYS = '''[vars]
 keys = [
   { mod="SUPER", key="Return", func="spawn", exec=["xterm"] },
@@ -137,7 +134,11 @@ def build_system(args, work):
             return run("chroot", root, *command, env=env, **kwargs)
 
         inside("/usr/sbin/pkg", "bootstrap", "-y")
-        inside("/usr/local/sbin/pkg", "install", "-y", *PACKAGES)
+        packages = run("sh", source / "scripts/dwm-freebsd-packages.sh", "image",
+                       capture_output=True, text=True).stdout.splitlines()
+        if not packages or any(not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_+.-]*", p) for p in packages):
+            raise ValueError("Invalid native image package profile")
+        inside("/usr/local/sbin/pkg", "install", "-y", *packages)
         inside("/usr/local/bin/gmake", "-C", "/usr/local/src/dwm-c9-freebsd", "CC=cc", "clean", "all")
         inside("/usr/bin/install", "-m", "755", "/usr/local/src/dwm-c9-freebsd/dwm", "/usr/local/bin/dwm")
         package_versions = inside("/usr/local/sbin/pkg", "query", "%n-%v", capture_output=True, text=True).stdout.splitlines()

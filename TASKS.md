@@ -1,17 +1,18 @@
 # Active FreeBSD tasks
 
-## Next milestone: native dependencies and integration cleanup
+## Next milestone: native installation and session lifecycle
 
-The minimal desktop passed owner testing on UEFI/ZFS. The full desktop remains
-unported. See ROADMAP.md and docs/FREEBSD-VM-VALIDATION.md.
+The minimal desktop passed owner testing on UEFI/ZFS. Native package profiles
+and excluded integration cleanup are implemented; see
+[cleanup validation](docs/FREEBSD-DEPENDENCY-REVIEW.md).
+The full desktop remains unported.
 
-- [ ] Inventory commands in startup, hotkeys, settings and helpers.
-- [ ] Share one native pkg dependency profile between installation and images.
-- [ ] Remove Steam/gaming, Flatpak, Gear Lever/AppImage and Herdr from active
-  code, configuration, dependencies, tests and documentation.
-- [ ] Remove their shortcuts, launch actions and settings delegates.
-- [ ] Verify remaining native packages and explicitly unsupported capabilities.
-- [ ] Run native package resolution and core/X11 checks; complete review.
+- [ ] Inventory startup/helper commands and select the next native session scope.
+- [ ] Replace GNU filesystem and Linux lifecycle assumptions in session helpers.
+- [ ] Add a config-preserving native installer/uninstaller for existing systems.
+- [ ] Validate native desktop-file paths, fonts and display-manager/startx entry.
+- [ ] Test installation, repeat installation and rollback on the snapshot VM.
+- [ ] Close core gaps: swallowing, status clicks and save/rename hot reloads.
 
-Historical Fedora issue tasks and authorizations remain in Git history and
-are not requirements of this detached fork.
+Quickshell service providers and updates/recovery follow this milestone.
+Historical Fedora issue authorizations do not govern this fork.

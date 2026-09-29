@@ -24,10 +24,6 @@ Options:
                          Defaults to DWM_INSTALL_PROFILE or full.
   --non-interactive      Use unattended defaults and do not prompt.
   --yes                  Accept the interactive install summary.
-  --install-herdr        Install verified Herdr as an optional workspace.
-  --skip-herdr           Do not install Herdr.
-  --enable-fedora-gaming-repos
-                         Approve the Gamescope COPR and RPM Fusion nonfree.
   --dry-run              Print the resolved plan and exit before changes.
   -h, --help             Show this help.
 EOF
@@ -54,12 +50,9 @@ MESLO_SHA256="13b502ac8c2bd9d3161018064560e23cd42b175bb730780a270975265a19ad57"
 NORDIC_THEME_URL="https://github.com/EliverLara/Nordic.git"
 NORDIC_THEME_REF="master"
 ARCH="$(uname -m)"
-FEDORA_GAMING_COPR="christitustech/copr-fedora"
 INSTALL_PROFILE="${DWM_INSTALL_PROFILE:-full}"
-HERDR_INSTALL_MODE="${DWM_INSTALL_HERDR:-false}"
 NON_INTERACTIVE=false
 ASSUME_YES=false
-FEDORA_GAMING_REPOS_APPROVED=false
 DRY_RUN=false
 
 while (($# > 0)); do
@@ -83,18 +76,6 @@ while (($# > 0)); do
 		;;
 	--yes)
 		ASSUME_YES=true
-		shift
-		;;
-	--install-herdr)
-		HERDR_INSTALL_MODE=true
-		shift
-		;;
-	--skip-herdr)
-		HERDR_INSTALL_MODE=false
-		shift
-		;;
-	--enable-fedora-gaming-repos)
-		FEDORA_GAMING_REPOS_APPROVED=true
 		shift
 		;;
 	--dry-run)
@@ -125,24 +106,6 @@ recommended | full) ;;
 	;;
 esac
 
-case "$HERDR_INSTALL_MODE" in
-auto)
-	# Retain compatibility with the old value, but no longer install Herdr by
-	# default for any profile.
-	HERDR_INSTALL_MODE=false
-	;;
-1 | true | yes)
-	HERDR_INSTALL_MODE=true
-	;;
-0 | false | no)
-	HERDR_INSTALL_MODE=false
-	;;
-*)
-	err "Unsupported DWM_INSTALL_HERDR: $HERDR_INSTALL_MODE"
-	err "Supported values: auto, true, false"
-	exit 1
-	;;
-esac
 
 if [[ ! -t 0 || ! -t 1 ]]; then
 	NON_INTERACTIVE=true
@@ -160,122 +123,6 @@ install_recommended_profile() {
 
 install_optional_profile() {
 	[[ $INSTALL_PROFILE == "full" ]]
-}
-
-herdr_arch_supported() {
-	case $ARCH in
-	x86_64 | amd64 | aarch64 | arm64)
-		return 0
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
-
-install_herdr_profile() {
-	[[ $HERDR_INSTALL_MODE == true ]] && herdr_arch_supported
-}
-
-fedora_gaming_profile() {
-	[[ $DISTRO_ID == "fedora" && $INSTALL_PROFILE == "full" && $ARCH == "x86_64" ]]
-}
-
-confirm_fedora_gaming_repositories() {
-	local answer
-
-	if ! fedora_gaming_profile || [[ $FEDORA_GAMING_REPOS_APPROVED == true ]]; then
-		return
-	fi
-	if [[ $NON_INTERACTIVE == true ]]; then
-		warn "Skipping Fedora gaming packages because third-party repositories were not approved."
-		warn "Re-run with --enable-fedora-gaming-repos to approve the Gamescope COPR and RPM Fusion nonfree."
-		return
-	fi
-
-	printf 'Enable the %s COPR and RPM Fusion nonfree for Fedora gaming packages? [y/N] ' \
-		"$FEDORA_GAMING_COPR"
-	read -r answer
-	case "$answer" in
-	y | Y | yes | YES)
-		FEDORA_GAMING_REPOS_APPROVED=true
-		;;
-	*)
-		warn "Fedora gaming repositories declined; skipping Steam, Gamescope, GameMode, and MangoHud."
-		;;
-	esac
-}
-
-configure_fedora_gaming_repositories() {
-	local fedora_release
-	local plugin_package
-	local rpmfusion_release_url
-
-	if [[ $DISTRO_ID != "fedora" || $INSTALL_PROFILE != "full" || $ARCH != "x86_64" ]]; then
-		return 1
-	fi
-	if [[ $FEDORA_GAMING_REPOS_APPROVED != true ]]; then
-		return 1
-	fi
-
-	if ! dnf copr --help &>/dev/null; then
-		info "Installing the DNF COPR plugin..."
-		for plugin_package in dnf5-plugins dnf-plugins-core; do
-			if install_packages "$plugin_package"; then
-				break
-			fi
-		done
-		if ! dnf copr --help &>/dev/null; then
-			warn "Could not install a working DNF COPR plugin; skipping Fedora gaming packages."
-			return 1
-		fi
-	fi
-
-	if ! command -v rpm &>/dev/null; then
-		warn "rpm is unavailable; cannot determine the Fedora release for RPM Fusion."
-		return 1
-	fi
-	fedora_release=$(rpm -E '%fedora')
-	case "$fedora_release" in
-	'' | *[!0-9]*)
-		warn "Could not determine the numeric Fedora release for RPM Fusion."
-		return 1
-		;;
-	esac
-	rpmfusion_release_url="https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${fedora_release}.noarch.rpm"
-	info "Enabling RPM Fusion nonfree for Steam..."
-	if ! sudo dnf install -y "$rpmfusion_release_url"; then
-		warn "Could not enable RPM Fusion nonfree; skipping Fedora gaming packages."
-		return 1
-	fi
-
-	info "Enabling the $FEDORA_GAMING_COPR COPR for the patched Gamescope package..."
-	if ! sudo dnf copr enable -y "$FEDORA_GAMING_COPR"; then
-		warn "Could not enable $FEDORA_GAMING_COPR; skipping Fedora gaming packages."
-		return 1
-	fi
-}
-
-configure_fedora_gamemode_access() {
-	local target_user
-
-	if [[ $DISTRO_ID != "fedora" || $INSTALL_PROFILE != "full" ]]; then
-		return
-	fi
-	if ! getent group gamemode >/dev/null 2>&1; then
-		warn "GameMode was not installed; skipping privileged tuning access."
-		return
-	fi
-
-	target_user=$(id -un)
-	if id -nG "$target_user" | tr ' ' '\n' | command grep -Fxq gamemode; then
-		ok "$target_user already has GameMode tuning access."
-		return
-	fi
-
-	info "Adding $target_user to the gamemode group..."
-	sudo usermod -aG gamemode "$target_user"
-	warn "Log out and back in before using GameMode privileged tuning."
 }
 
 package_line() {
@@ -308,31 +155,15 @@ print_install_summary() {
 	print_summary_profile "Required packages" required
 	if install_recommended_profile; then
 		print_summary_profile "Recommended packages" recommended
-		printf '  Gear Lever: user-scoped Flathub install (%s)\n' 'it.mijorus.gearlever'
 	else
 		printf '  Recommended packages: skipped\n'
 	fi
 	if install_optional_profile; then
 		print_summary_profile "Optional extras" optional
-		if fedora_gaming_profile; then
-			print_summary_profile "Fedora gaming packages" gaming
-			if [[ $FEDORA_GAMING_REPOS_APPROVED == true ]]; then
-				printf '  Third-party repositories: approved\n'
-			else
-				printf '  Third-party repositories: require separate confirmation\n'
-			fi
-		fi
 	else
 		printf '  Optional extras: skipped\n'
 	fi
 	print_summary_profile "Terminal candidates" terminal
-	if install_herdr_profile; then
-		printf '  Herdr workspace: verified user install from https://herdr.dev/install.sh\n'
-	elif [[ $HERDR_INSTALL_MODE == true ]]; then
-		printf '  Herdr workspace: skipped (unsupported architecture: %s)\n' "$ARCH"
-	else
-		printf '  Herdr workspace: skipped (optional; use --install-herdr to enable)\n'
-	fi
 	echo ""
 }
 
@@ -565,7 +396,6 @@ info "Family: $DISTRO_FAMILY"
 info "Package manager: $PKG_CMD"
 info "Install profile: $INSTALL_PROFILE"
 confirm_install_summary
-confirm_fedora_gaming_repositories
 
 if [[ $NON_INTERACTIVE != true ]]; then
 	"$REPO_DIR/scripts/configure-build.sh"
@@ -615,19 +445,6 @@ if install_optional_profile; then
 	if ! dwm_install_available_package_profile optional; then
 		warn "Some optional desktop extras were unavailable in enabled repositories."
 	fi
-	if fedora_gaming_profile; then
-		if [[ $FEDORA_GAMING_REPOS_APPROVED != true ]]; then
-			warn "Fedora gaming packages were skipped because their repositories were not approved."
-		elif configure_fedora_gaming_repositories; then
-			info "Installing Fedora gaming packages..."
-			if ! dwm_install_available_package_profile gaming; then
-				warn "Some Fedora gaming packages were unavailable in the approved repositories."
-			fi
-			configure_fedora_gamemode_access
-		else
-			warn "Fedora gaming repository setup failed; no gaming packages were installed."
-		fi
-	fi
 	ok "Optional desktop extras processed."
 else
 	warn "Skipping optional desktop extras for $INSTALL_PROFILE profile."
@@ -673,23 +490,6 @@ else
 			terminal="$(detect_terminal)"
 		fi
 	fi
-fi
-
-# ── Herdr terminal workspace ─────────────────────────────
-if install_herdr_profile; then
-	info "Installing the verified Herdr workspace for interactive terminals..."
-	if "$REPO_DIR/scripts/install-herdr"; then
-		ok "Herdr is installed; set DWM_HERDR=1 and use dwm-terminal to open it in $terminal."
-	else
-		herdr_status=$?
-		if [[ $herdr_status -eq 2 ]]; then
-			warn "Herdr is ready, but one or more detected agent integrations could not be installed."
-		else
-			warn "Herdr installation failed; Alacritty remains the default terminal."
-		fi
-	fi
-elif [[ $HERDR_INSTALL_MODE == true ]]; then
-	warn "Skipping Herdr installation on unsupported architecture: $ARCH."
 fi
 
 # ── XDG dirs + wallpapers ────────────────────────────────
@@ -750,16 +550,7 @@ sudo make install \
 info "Installing DNF5 defaults while preserving administrator settings."
 dnf_defaults_helper=$(make -s --no-print-directory print-dnf-defaults-helper)
 sudo /usr/bin/python3 -I "$dnf_defaults_helper" install --source "$REPO_DIR/config/dnf/40-dwm-titus.conf"
-# Seed before Gear Lever creates its AppImage MIME preference file.
 bash "$REPO_DIR/scripts/seed-default-apps.sh"
-if install_recommended_profile; then
-	info "Setting up Gear Lever for AppImage management..."
-	if "$REPO_DIR/scripts/install-gearlever"; then
-		ok "Gear Lever is installed."
-	else
-		warn "Gear Lever setup failed; retry with scripts/install-gearlever when Flathub is reachable."
-	fi
-fi
 configure_displays_after_install
 
 # ── Done ─────────────────────────────────────────────────

@@ -15,8 +15,8 @@ The existing working desktop is kept while new changes are built and tested.
 | Build dependencies below | SSH verified installed |
 | Git | Initially missing; subsequently installed and verified as 2.54.0 |
 | SSH public-key access | Verified from Windows over IPv4, localhost port 2244 |
-| VirtualBox recovery snapshot | Recommended; creation not yet confirmed |
-| Regular-user source checkout and local core gate | Instructions supplied; completion not yet confirmed on this VM |
+| VirtualBox recovery snapshot | Owner confirmed snapshot created |
+| Regular-user source checkout and local core gate | Completed; native core and X11 gate passed over SSH |
 
 Existing hosted CI results are separate from running the core gate on this VM.
 No new local test result is implied by the installed dependencies.
@@ -125,7 +125,8 @@ The gate checks native process handling, performs a clean dwm build and stages
 the binary in a private temporary directory. It does not install over the
 working desktop and removes its temporary directory when finished.
 Keep the output, tested commit and FreeBSD version when reporting a result.
-This local gate has not yet been confirmed on our VM.
+This local gate has passed on our VM. One earlier X11 readiness timeout was
+reported; a later SSH run passed. Its cause has not yet been established.
 
 For an optional inspectable build in the checkout:
 
@@ -150,6 +151,6 @@ connection. It starts the installed binary, not the new checkout build.
 For automated testing of a newly built binary in a separate Xvfb display, see
 the X11 gate in the [FreeBSD guide](https://lirux9873.github.io/dwm-c9-freebsd/install.html#validation-status).
 
-Next migration milestone: shared native dependencies and removal of excluded
-integrations. Follow the repository TASKS.md and ROADMAP.md; a working minimal
+Shared native dependency profiles and integration cleanup are implemented.
+Next migration milestone: native installation and session lifecycle. Follow the repository TASKS.md and ROADMAP.md; a working minimal
 session does not mean the Quickshell services or complete installer are ported.
