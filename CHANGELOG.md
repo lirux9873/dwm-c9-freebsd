@@ -1,5 +1,11 @@
 # Changelog
 
+- Share native FreeBSD dependency profiles between image creation and CI;
+  include Git in new minimal images and document the native package mapping.
+- Remove Steam/gaming, Flatpak, Gear Lever/AppImage and Herdr integrations
+  from active installers, helpers, defaults, tests and site documentation.
+  Existing installed applications and user configuration are not modified.
+
 - Document the verified test-VM setup, Windows SSH key connection and pending
   regular-user build gate; add a dedicated Test VM setup documentation page.
 

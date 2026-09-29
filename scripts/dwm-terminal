@@ -16,40 +16,6 @@ if [[ ${1:-} == "--print-command" ]]; then
 	shift
 fi
 
-find_herdr() {
-	local candidate
-
-	case ${DWM_HERDR:-0} in
-	1 | true | yes) ;;
-	*) return 1 ;;
-	esac
-
-	if [[ -n ${DWM_HERDR_COMMAND:-} ]]; then
-		if command -v "$DWM_HERDR_COMMAND" >/dev/null 2>&1; then
-			command -v "$DWM_HERDR_COMMAND"
-			return
-		fi
-		if [[ -x $DWM_HERDR_COMMAND ]]; then
-			printf '%s\n' "$DWM_HERDR_COMMAND"
-			return
-		fi
-		return 1
-	fi
-
-	if candidate=$(command -v herdr 2>/dev/null); then
-		printf '%s\n' "$candidate"
-		return
-	fi
-
-	candidate="${HOME:-}/.local/bin/herdr"
-	if [[ -n ${HOME:-} && -x $candidate ]]; then
-		printf '%s\n' "$candidate"
-		return
-	fi
-
-	return 1
-}
-
 configured_terminal() {
 	local config_home=${XDG_CONFIG_HOME:-${HOME:-}/.config}
 	local config=$config_home/dwm-titus/hotkeys.toml
@@ -96,10 +62,6 @@ for terminal in "${terminals[@]}"; do
 		if ((print_only)); then
 			printf '%s\n' "$terminal"
 			exit 0
-		fi
-
-		if (($# == 0)) && herdr=$(find_herdr); then
-			exec "$terminal" -e "$herdr"
 		fi
 
 		exec "$terminal" "$@"

@@ -41,16 +41,15 @@ jobs:
           copyback: false
           prepare: |
             set -eu
-            pkg install -y gmake pkgconf libinotify \
-              libX11 libXft libXinerama libXrender libxcb xcb-util \
-              imlib2 freetype2 fontconfig python3 \
-              xorg-vfbserver xterm xdotool xprop noto-sans-mono noto-emoji
             pw useradd -n dwmci -m -s /bin/sh
           run: |
             set -eu
+            packages=$(sh scripts/dwm-freebsd-packages.sh test)
+            pkg install -y $packages
             freebsd-version -kru
             uname -m
             cp -R . /home/dwmci/source
             chown -R dwmci:dwmci /home/dwmci/source
+            su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-packages.py'
             su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-image-builders.py'
             su -l dwmci -c 'cd /home/dwmci/source && env DWM_FREEBSD_X11_SMOKE=1 sh tests/test-freebsd-core.sh'

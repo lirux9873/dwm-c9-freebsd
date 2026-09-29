@@ -9,7 +9,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 mkdir -p "$work/data/applications"
-mkdir -p "$work/home/.local/share/flatpak/exports/share/applications"
+mkdir -p "$work/home/.local/share/applications"
 mkdir -p "$work/home/.local/share/snapd/applications"
 mkdir -p "$work/bin"
 
@@ -38,7 +38,7 @@ visible_desktop="$work/data/applications/visible.desktop"
 browser_desktop="$work/data/applications/browser-actions.desktop"
 editor_desktop="$work/data/applications/editor-actions.desktop"
 symlink_desktop="$work/data/applications/symlink.desktop"
-flatpak_desktop="$work/home/.local/share/flatpak/exports/share/applications/flatpak.desktop"
+native_desktop="$work/data/applications/native.desktop"
 snap_desktop="$work/home/.local/share/snapd/applications/snap.desktop"
 localized_desktop="$work/data/applications/localized.desktop"
 chatgpt_native_desktop="$work/data/applications/chatgpt.desktop"
@@ -101,15 +101,15 @@ Exec=symlinked-app
 DESKTOP
 ln -s "$work/data/applications/symlink-target.desktop" "$work/data/applications/symlink.desktop"
 
-cat >"$work/home/.local/share/flatpak/exports/share/applications/flatpak.desktop" <<'DESKTOP'
+cat >"$work/data/applications/native.desktop" <<'DESKTOP'
 [Desktop Entry]
 Type=Application
-Name=Flatpak Export
+Name=Native Export
 GenericName=Exported App
-Comment=Shown from Flatpak export path
-Exec=flatpak-export
-Icon=flatpak
-Keywords=flatpak;exported;
+Comment=Shown from Native export path
+Exec=native-export
+Icon=native
+Keywords=native;exported;
 Categories=Network;
 DESKTOP
 
@@ -247,7 +247,7 @@ assert_listed 'Visible App	Utility	Shown in launcher	visible-app --flag %U	visib
 assert_listed 'Visible App	Utility	Shown in launcher	visible-app --flag %U	visible	'"$visible_desktop"'	visible;sample;	Utility;System;'
 assert_listed 'Brave Origin Browser	Web Browser	Access the Internet	brave-origin-beta %U	brave-origin-beta	'"$browser_desktop"'		Network;WebBrowser;		new-window;new-private-window;'
 assert_listed 'Zed	Text Editor	A high-performance code editor.	zeditor %U	zed	'"$editor_desktop"'	zed;	Utility;TextEditor;Development;IDE;		NewWorkspace;'
-assert_listed 'Flatpak Export	Exported App	Shown from Flatpak export path	flatpak-export	flatpak	'"$flatpak_desktop"'	flatpak;exported;	Network;'
+assert_listed 'Native Export	Exported App	Shown from Native export path	native-export	native	'"$native_desktop"'	native;exported;	Network;'
 assert_listed 'Snap Export	Packaged App	Shown from Snap export path	snap-export	snap	'"$snap_desktop"'	snap;exported;	Utility;	snap-export	new-window;'
 assert_listed 'Localized Name	Localized Generic	Localized comment	localized-app	localized	'"$localized_desktop"'	localized;translated;	Office;'
 assert_listed 'Symlinked App			symlinked-app		'"$symlink_desktop"
@@ -331,6 +331,12 @@ fi
 if printf '%s\n' "$custom_desktop_output" | grep -Fq 'Empty Only App'; then
 	printf 'Empty Only App should not be listed when XDG_CURRENT_DESKTOP=XFCE\n' >&2
 	exit 1
+fi
+
+# Discovery can be validated before the managed session helper is ported.
+if [ "${DWM_TEST_LAUNCHER_LIST_ONLY:-0}" = 1 ]; then
+	printf 'Desktop-entry discovery passed; session launch not tested.\n'
+	exit 0
 fi
 
 cat >"$work/bin/dex" <<'SH'

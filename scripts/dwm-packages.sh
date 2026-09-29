@@ -6,6 +6,9 @@ dwm_packages() {
 	local profile=$2
 
 	case "$family:$profile" in
+	freebsd:*)
+		sh "$(dirname -- "${BASH_SOURCE[0]}")/dwm-freebsd-packages.sh" "$profile"
+		;;
 	fedora:build)
 		printf '%s\n' \
 			gcc make pkgconf-pkg-config libX11-devel libXft-devel \
@@ -50,7 +53,7 @@ dwm_packages() {
 			quickshell picom python3 feh dex-autostart mate-polkit xsettingsd bubblewrap libseccomp \
 			alsa-utils brightnessctl dbus-tools inotify-tools jq pulseaudio-utils pipewire pavucontrol \
 			pipewire-pulseaudio wireplumber libnotify light-locker xorg-x11-drv-libinput \
-			bluez blueman playerctl upower power-profiles-daemon flatpak xdg-desktop-portal-gtk
+			bluez blueman playerctl upower power-profiles-daemon xdg-desktop-portal-gtk
 		;;
 	fedora:system-management)
 		printf '%s\n' \
@@ -70,13 +73,6 @@ dwm_packages() {
 			Thunar gvfs gvfs-smb tumbler thunar-archive-plugin file-roller \
 			xdg-user-dirs gnome-keyring gnome-keyring-pam NetworkManager \
 			rsync
-		;;
-	fedora:gaming)
-		if [[ ${ARCH:-$(uname -m)} == x86_64 ]]; then
-			printf '%s\n' \
-				steam gamescope gamemode.x86_64 gamemode.i686 \
-				mangohud.x86_64 mangohud.i686
-		fi
 		;;
 	fedora:theme)
 		printf '%s\n' dconf adwaita-icon-theme papirus-icon-theme
@@ -135,7 +131,6 @@ dwm_packages() {
 		dwm_packages "$family" required
 		dwm_packages "$family" recommended
 		dwm_packages "$family" optional
-		dwm_packages "$family" gaming
 		;;
 	*)
 		return 1

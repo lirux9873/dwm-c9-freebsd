@@ -91,9 +91,9 @@ assumptions. With no adjacent launcher helper, dwm launches applications directl
 
 1. Finish core runtime validation: swallowing, status clicks, focus and
    hot-reload saves/renames. Native build/process/basic X11 tests already pass.
-2. Replace the inherited dependency/installation profiles with the reduced
-   native package scope. Remove unwanted optional integrations from helpers,
-   defaults, settings, tests and documentation, including their UI actions.
+2. Extend the shared native package profiles as additional desktop components
+   are ported. The minimal image and CI now share a profile helper; see
+   [native dependencies](https://lirux9873.github.io/dwm-c9-freebsd/dependencies.html).
 3. Supply native startup/shutdown, config-preserving installation, fonts and
    desktop-file paths; remove the active Linux-specific service lifecycle.
 4. Adapt the Quickshell providers for audio, networking, Bluetooth, brightness,
@@ -104,8 +104,8 @@ assumptions. With no adjacent launcher helper, dwm launches applications directl
 6. Replace inherited CI/release/image workflows and finish branding and docs.
 
 The previously removed optional applications are outside this fork's target
-scope. They are not reintroduced by this core change. Their inherited source
-still needs the repository-wide cleanup in milestone 2.
+scope. Their integrations have been removed from active helpers, defaults,
+install paths and site guides. Historical release records are retained.
 
 ## Validation status
 

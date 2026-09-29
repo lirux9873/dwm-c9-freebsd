@@ -47,6 +47,7 @@ find_browser_exec() {
 	for desktop_file in \
 		"$HOME/.local/share/applications/$browser" \
 		"$HOME/.nix-profile/share/applications/$browser" \
+		"/usr/local/share/applications/$browser" \
 		"/usr/share/applications/$browser"; do
 		[[ -f $desktop_file ]] || continue
 		exec_line=$(grep -m 1 '^Exec=' "$desktop_file" || true)
@@ -57,7 +58,7 @@ find_browser_exec() {
 			return 1
 		fi
 		case ${exec_path##*/} in
-		flatpak | flatpak-* | snap | env)
+		snap | env)
 			printf '%s: unsupported browser wrapper in %s: %s\n' \
 				"${0##*/}" "$desktop_file" "$exec_path" >&2
 			return 1

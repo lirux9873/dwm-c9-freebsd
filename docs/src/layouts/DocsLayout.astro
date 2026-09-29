@@ -21,7 +21,7 @@ const eyebrow = Astro.props.eyebrow ?? frontmatter?.eyebrow ?? "Documentation";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const localUrl = (href: string) => href.startsWith("/") ? base + href : href;
 const pathname = Astro.url.pathname.slice(base.length) || "/";
-const isCurrentGuide = ["/", "/index.html", "/install.html", "/documentation.html", "/test-host.html"].includes(pathname);
+const isCurrentGuide = ["/", "/index.html", "/install.html", "/documentation.html", "/test-host.html", "/dependencies.html"].includes(pathname);
 const currentHref = pathname === "/" || pathname === "/index.html" ? "/install.html" : pathname;
 const pageIndex = Math.max(0, navigation.findIndex((item) => item.href === currentHref));
 const previous = pageIndex > 0 ? navigation[pageIndex - 1] : undefined;

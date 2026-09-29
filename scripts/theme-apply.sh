@@ -1128,7 +1128,7 @@ personalization_live_write_test_wait() {
 	done
 }
 
-# Live D-Bus update — affects running GTK4 apps, Flatpaks, and XDG portals
+# Live D-Bus update — affects running GTK4 apps and XDG portals
 if [[ $RUNTIME_ONLY == 0 && $TRANSACTIONAL_APPLY == 0 &&
 	$PRESERVE_DESKTOP_SETTINGS == 0 ]] && command -v gsettings &>/dev/null; then
 	if [[ $STRICT_PERSONALIZATION == 1 && $PERSONALIZATION_CAPABILITY != qt ]]; then

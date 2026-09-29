@@ -25,21 +25,8 @@ desktop-file-validate /usr/local/share/applications/sxiv.desktop
 update-desktop-database /usr/local/share/applications
 cp -a /home/imagebuilder/.local/share/fonts/. /usr/local/share/fonts/dwm-titus/
 # User configuration is generated offline for the real account at installation.
-# Install the Flatpak system-wide so it is not tied to the factory account.
-# Expanded by the private child shell.
-# shellcheck disable=SC2016
-dbus-run-session -- sh -ec '
-export DBUS_SYSTEM_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
-/usr/share/dwm-titus-image/scripts/dwm-flatpak-setup --system
-if ! flatpak --system info it.mijorus.gearlever >/dev/null 2>&1; then
-flatpak --system install --noninteractive -y flathub it.mijorus.gearlever
-flatpak --system info it.mijorus.gearlever
-fi
-'
 fc-cache -f
 rpm -qa --qf '%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort >/usr/share/dwm-titus-image/rpm-manifest.txt
-flatpak --system list --columns=ref:full,active:full >/usr/share/dwm-titus-image/flatpak-manifest.txt
 printf 'protocol=1\nvariant=%s\nfedora=44\narchitecture=x86_64\n' "$variant" >/etc/dwm-titus-image
 [[ -x /usr/local/bin/dwm && -f /usr/share/xsessions/dwm.desktop ]]
-[[ -d /var/lib/flatpak/app/it.mijorus.gearlever ]]
 printf 'DWM_FACTORY_PREPARED\n'

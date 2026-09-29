@@ -7,6 +7,7 @@ work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
 mkdir -p "$work/bin" "$work/home/.local/share/applications"
+ln -s "$BASH" "$work/bin/bash"
 
 cat >"$work/bin/xdg-settings" <<'EOF'
 #!/bin/sh
@@ -55,7 +56,7 @@ cat >"$work/home/.local/share/applications/brave-wrapper.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
 Name=Wrapped Test Browser
-Exec=flatpak run com.example.Browser %U
+Exec=env BROWSER_MODE=app browser %U
 EOF
 
 run_webapp() {
