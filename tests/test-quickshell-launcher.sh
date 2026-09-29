@@ -381,7 +381,7 @@ printf '%s\n' 'export QT_QPA_PLATFORMTHEME=qt6ct' \
 assert_file_line "$work/theme-env-relative-config.log" "$(printf 'gtk3\tCursor-One\t32')"
 
 exec 9>"$work/runtime/dwm-theme-apply.lock"
-flock 9
+python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_EX)'
 printf '%s\n' 'export QT_QPA_PLATFORMTHEME=qt6ct' \
 	'export XCURSOR_THEME=Uncommitted-Cursor' 'export XCURSOR_SIZE=48' \
 	>"$work/home/.config/dwm-titus/theme-env.sh"
@@ -405,13 +405,13 @@ done
 printf '%s\n' 'export QT_QPA_PLATFORMTHEME=gtk3' \
 	'export XCURSOR_THEME=Cursor-One' 'export XCURSOR_SIZE=32' \
 	>"$work/home/.config/dwm-titus/theme-env.sh"
-flock -u 9
+python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_UN)'
 exec 9>&-
 wait "$locked_launcher_pid"
 assert_file_line "$work/theme-env-locked.log" "$(printf 'gtk3\tCursor-One\t32')"
 
 exec 9>"$work/runtime/dwm-theme-apply.lock"
-flock 9
+python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_EX)'
 QT_QPA_PLATFORMTHEME=parent-qt XCURSOR_THEME=Parent-Cursor XCURSOR_SIZE=24 \
 	DWM_TEST_DEX_LOG="$work/dex-timeout.log" \
 	DWM_TEST_THEME_ENV_LOG="$work/theme-env-timeout.log" \
@@ -421,7 +421,7 @@ QT_QPA_PLATFORMTHEME=parent-qt XCURSOR_THEME=Parent-Cursor XCURSOR_SIZE=24 \
 	PATH="$work/bin:$PATH" \
 	timeout 4 "$repo/scripts/dwm-session-launch" dex \
 	"$work/data/applications/visible.desktop"
-flock -u 9
+python3 -c 'import fcntl; fcntl.flock(9, fcntl.LOCK_UN)'
 exec 9>&-
 assert_file_line "$work/theme-env-timeout.log" "$(printf 'parent-qt\tParent-Cursor\t24')"
 
@@ -494,7 +494,7 @@ grep -Fqx "desktop entry not found: $work/data/applications/missing.desktop" "$w
 
 grep -Fq 'readlink("/proc/self/exe", launcher' "$repo/dwm.c"
 grep -Fq 'memcpy(separator, "/dwm-session-launch"' "$repo/dwm.c"
-grep -Fq 'posix_spawn(NULL, wrapped[0]' "$repo/dwm.c"
+grep -Fq 'posix_spawn(&child, wrapped[0]' "$repo/dwm.c"
 if grep -Fq -- '-DPREFIX=' "$repo/config.mk"; then
 	printf 'DWM still embeds a stale compile-time install prefix\n' >&2
 	exit 1

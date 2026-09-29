@@ -83,9 +83,12 @@ The Makefile creates `config.h` only if it is absent. This produces a binary;
 it does not install a native desktop or provide a complete session. For the
 initial X11 trial, use isolated XDG configuration/data directories and native
 hotkeys from the earlier installation guide. Do not copy the inherited
-autostart scripts into those data directories. Do not install the inherited
-`dwm-session-launch` helper yet; it still contains GNU `stat` and updater
-assumptions. With no adjacent launcher helper, dwm launches applications directly.
+autostart scripts into those data directories. The `dwm-session-launch` helper
+now has tested FreeBSD metadata checks, locking and native data-directory
+defaults. Its full launcher regression test passes on the VM, but integration
+into a native installer and complete session remains pending. With no adjacent
+launcher helper, dwm launches applications directly. The theme writer and
+Quickshell services are still unported.
 
 ## Remaining migration work
 

@@ -8,7 +8,8 @@ and excluded integration cleanup are implemented; see
 The full desktop remains unported.
 
 - [ ] Inventory startup/helper commands and select the next native session scope.
-- [ ] Replace GNU filesystem and Linux lifecycle assumptions in session helpers.
+- [x] Port application-launch metadata checks and locking; validate native launcher tests.
+- [ ] Port remaining session lifecycle helpers and the theme writer.
 - [ ] Add a config-preserving native installer/uninstaller for existing systems.
 - [ ] Validate native desktop-file paths, fonts and display-manager/startx entry.
 - [ ] Test installation, repeat installation and rollback on the snapshot VM.
