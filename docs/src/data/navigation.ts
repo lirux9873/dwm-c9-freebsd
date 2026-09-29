@@ -6,6 +6,7 @@ export const navigation = [
   { href: "/dependencies.html", label: "Dependencies", index: "02", group: "Start" },
   { href: "/getting-started.html", label: "Getting Started", index: "03", group: "Start" },
   { href: "/development-progress.html", label: "Development Progress", index: "04", group: "Project" },
+  { href: "/open-tasks.html", label: "Open FreeBSD tasks", index: "04a", group: "Project" },
   { href: "/keybinds.html", label: "Keybindings", index: "05", group: "Use" },
   { href: "/configuration.html", label: "Configuration", index: "06", group: "Customize" },
   { href: "/theming.html", label: "Theming", index: "07", group: "Customize" },
