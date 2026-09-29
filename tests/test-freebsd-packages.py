@@ -26,7 +26,9 @@ class Profiles(unittest.TestCase):
             profiles[name] = set(packages)
         self.assertLessEqual(profiles["build"] | profiles["runtime"], profiles["image"])
         self.assertIn("git", profiles["image"])
-        self.assertLessEqual(profiles["build"] | profiles["runtime"] | {"quickshell", "python3", "bash", "xdotool", "xprop"}, profiles["desktop"])
+        self.assertLessEqual(profiles["build"] | profiles["runtime"] |
+                             {"quickshell", "python3", "bash", "xdotool", "xprop", "feh"},
+                             profiles["desktop"])
         self.assertLessEqual({"python3", "xorg-vfbserver", "xdotool", "xprop"}, profiles["test"])
         self.assertLessEqual(profiles["build"] | {"git", "python3"}, profiles["host"])
 

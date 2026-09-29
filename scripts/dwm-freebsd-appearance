@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+"""Apply the native FreeBSD theme and wallpaper without Linux services."""
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+import tomllib
+
+
+def config_root():
+    configured = os.environ.get("XDG_CONFIG_HOME", "")
+    if configured.startswith("/"):
+        return Path(configured)
+    return Path.home() / ".local/share/dwm-c9-freebsd/config"
+
+
+ROOT = config_root() / "dwm-titus"
+THEMES = ROOT / "themes.toml"
+PALETTE = ROOT / "native-theme.json"
+WALLPAPER = ROOT / "wallpaper.conf"
+COLOR = re.compile(r"^#[0-9A-Fa-f]{6}$")
+REQUIRED = ("normfgcolor", "normbgcolor", "normbordercolor", "selfgcolor",
+            "selbgcolor", "selbordercolor")
+
+
+def atomic_write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(prefix="." + path.name + ".", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def load_theme():
+    with THEMES.open("rb") as stream:
+        document = tomllib.load(stream)
+    name = document.get("active", {}).get("theme", "")
+    themes = document.get("theme", {})
+    if name not in themes:
+        raise ValueError("Unknown active theme: " + name)
+    theme = themes[name]
+    for key in REQUIRED:
+        if not COLOR.fullmatch(str(theme.get(key, ""))):
+            raise ValueError("Invalid theme color: " + key)
+    return document, name, theme
+
+
+def palette(theme):
+    color = lambda key, fallback: theme.get(key, fallback)
+    return {
+        "background": color("term_bg", theme["normbgcolor"]),
+        "bar-background": theme["normbgcolor"],
+        "surface": theme["normbgcolor"],
+        "surface-hover": color("term_color8", theme["normbordercolor"]),
+        "surface-active": theme["selbgcolor"],
+        "border": theme["normbordercolor"],
+        "border-strong": theme["selbordercolor"],
+        "text": theme["normfgcolor"],
+        "text-strong": theme["selfgcolor"],
+        "text-muted": theme["normfgcolor"],
+        "placeholder": color("term_color8", theme["normbordercolor"]),
+        "accent": theme["selbordercolor"],
+        "accent-secondary": color("term_color6", theme["selbordercolor"]),
+        "accent-text": color("term_bg", theme["normbgcolor"]),
+        "success": color("term_color2", theme["selbordercolor"]),
+        "warning": color("term_color3", theme["normfgcolor"]),
+        "danger": color("term_color1", theme["selbordercolor"]),
+        "danger-surface": theme["normbordercolor"],
+        "dark": bool(theme.get("dark_mode", True)),
+    }
+
+
+def apply_theme():
+    _, name, theme = load_theme()
+    data = {"name": name, "colors": palette(theme)}
+    atomic_write(PALETTE, json.dumps(data, separators=(",", ":")) + "\n")
+    if os.environ.get("DISPLAY"):
+        subprocess.run(["xsetroot", "-solid", data["colors"]["background"]], check=True)
+    return name, theme
+
+
+def select_theme(name):
+    with THEMES.open("rb") as stream:
+        document = tomllib.load(stream)
+    if name not in document.get("theme", {}):
+        raise ValueError("Unknown theme: " + name)
+    text = THEMES.read_text()
+    changed, count = re.subn(r'(?m)^(theme\s*=\s*)"[^"]*"\s*$',
+                             lambda match: match.group(1) + '"' + name + '"', text, count=1)
+    if count != 1:
+        raise ValueError("Missing [active] theme setting")
+    atomic_write(THEMES, changed)
+    apply_theme()
+    apply_saved_wallpaper()
+
+
+def wallpaper_selection():
+    if not WALLPAPER.exists():
+        return None
+    values = {}
+    for line in WALLPAPER.read_text().splitlines():
+        if "=" in line:
+            key, value = line.split("=", 1)
+            values[key] = value
+    path = Path(values.get("path", ""))
+    fit = values.get("fit", "fill")
+    if not path.is_absolute() or not path.is_file() or path.is_symlink():
+        raise ValueError("Saved wallpaper is unavailable or unsafe")
+    if fit not in ("fill", "max", "scale", "center", "tile"):
+        raise ValueError("Invalid saved wallpaper mode")
+    return path, fit
+
+
+def apply_wallpaper():
+    selection = wallpaper_selection()
+    if selection is None:
+        return
+    if not os.environ.get("DISPLAY"):
+        raise ValueError("DISPLAY is required to apply a wallpaper")
+    path, fit = selection
+    subprocess.run(["feh", "--no-fehbg", "--bg-" + fit, str(path)], check=True)
+
+
+def apply_saved_wallpaper():
+    try:
+        apply_wallpaper()
+    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+        print("dwm-freebsd-appearance: saved wallpaper skipped:", error, file=sys.stderr)
+
+
+def set_wallpaper(raw_path, fit):
+    path = Path(raw_path).expanduser().resolve(strict=True)
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("Wallpaper must be a regular image file")
+    if path.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp", ".bmp"):
+        raise ValueError("Unsupported wallpaper extension")
+    if fit not in ("fill", "max", "scale", "center", "tile"):
+        raise ValueError("Use fill, max, scale, center or tile")
+    atomic_write(WALLPAPER, "path=" + str(path) + "\nfit=" + fit + "\n")
+    apply_wallpaper()
+
+
+def terminal(arguments):
+    _, _, theme = load_theme()
+    command = ["xterm", "-fa", "Noto Sans Mono", "-fs", "11",
+               "-bg", theme.get("term_bg", theme["normbgcolor"]),
+               "-fg", theme.get("term_fg", theme["normfgcolor"]),
+               "-cr", theme.get("term_cursor", theme["selbordercolor"]), "-b", "12"]
+    os.execvp(command[0], command + arguments)
+
+
+def main():
+    action = sys.argv[1:]
+    if action == ["apply"]:
+        apply_theme()
+        apply_saved_wallpaper()
+    elif action == ["themes"]:
+        with THEMES.open("rb") as stream:
+            document = tomllib.load(stream)
+        print("\n".join(document.get("theme", {})))
+    elif len(action) == 2 and action[0] == "theme":
+        select_theme(action[1])
+    elif len(action) in (2, 3) and action[0] == "wallpaper":
+        set_wallpaper(action[1], action[2] if len(action) == 3 else "fill")
+    elif action == ["clear-wallpaper"]:
+        WALLPAPER.unlink(missing_ok=True)
+        apply_theme()
+    elif action and action[0] == "terminal":
+        terminal(action[1:])
+    else:
+        raise ValueError("Usage: dwm-freebsd-appearance apply|themes|theme NAME|wallpaper PATH [fill|max|scale|center|tile]|clear-wallpaper")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, ValueError, subprocess.CalledProcessError, tomllib.TOMLDecodeError) as error:
+        print("dwm-freebsd-appearance:", error, file=sys.stderr)
+        sys.exit(1)

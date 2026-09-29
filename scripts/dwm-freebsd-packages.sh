@@ -17,7 +17,7 @@ packages() {
     desktop)
         packages build
         packages runtime
-        printf '%s\n' quickshell python3 bash xdotool xprop glib
+        printf '%s\n' quickshell python3 bash xdotool xprop glib feh
         ;;
     image)
         packages build

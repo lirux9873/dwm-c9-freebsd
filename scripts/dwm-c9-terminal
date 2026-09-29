@@ -1,2 +1,2 @@
 #!/bin/sh
-exec xterm -fa 'Noto Sans Mono' -fs 11 -bg '#202b3b' -fg '#dce6f2' -cr '#72d6c9' -b 12 "$@"
+exec dwm-freebsd-appearance terminal "$@"

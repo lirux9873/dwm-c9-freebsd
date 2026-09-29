@@ -51,6 +51,7 @@ jobs:
             cp -R . /home/dwmci/source
             chown -R dwmci:dwmci /home/dwmci/source
             su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-packages.py'
+            su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-appearance.py'
             su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-session-launch.py'
             su -l dwmci -c 'cd /home/dwmci/source && sh tests/test-quickshell-launcher.sh'
             su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-image-builders.py'

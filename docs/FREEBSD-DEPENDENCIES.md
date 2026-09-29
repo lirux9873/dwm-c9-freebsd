@@ -11,7 +11,7 @@ profile name to list packages, without installing or changing anything:
 | runtime | Minimal Xorg, xterm, D-Bus and fonts |
 | test | Build profile plus Python, Xvfb, xdotool, xprop, terminal and fonts |
 | image | Build + runtime + Git for subsequent regular-user development |
-| desktop | Build + runtime + quickshell, python3, bash, xdotool, xprop and glib |
+| desktop | Build + runtime + quickshell, python3, bash, xdotool, xprop, glib and feh |
 | host | Build + Git + Python for a development checkout |
 
 FreeBSD base supplies cc, sh, tar and core system tools. No Linux ABI packages

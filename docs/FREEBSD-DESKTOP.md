@@ -87,7 +87,7 @@ pkg install $packages
 ```
 
 This includes the compiler's library dependencies, Xorg/xterm, D-Bus, fonts,
-Quickshell, Python, Bash, xdotool, xprop and GLib. FreeBSD base supplies Clang.
+Quickshell, Python, Bash, feh, xdotool, xprop and GLib. FreeBSD base supplies Clang.
 Do not substitute Linux packages. If pkg cannot find quickshell for your ABI,
 stop and resolve the repository mismatch rather than installing another ABI.
 
@@ -143,6 +143,40 @@ Notifications, System and a clock. Check:
 
 Super is the Windows key. Do not overwrite `.xinitrc`; the explicit command
 selects this session. No automatic login or display manager is configured.
+
+## Themes and wallpaper
+
+The native desktop ships Nord, Dracula, Gruvbox and Tokyo Night palettes.
+Open **System** with Super+S and click a theme name. The choice is saved in
+`config/dwm-titus/themes.toml` below the installation directory. dwm and the
+Quickshell panel update immediately; newly opened terminals use the palette too.
+
+FreeBSD provides `feh` as a native package, and the desktop dependency profile
+installs it. To set a wallpaper, use an absolute or home-relative image path
+while the graphical session is running:
+
+```sh
+dwm-freebsd-appearance wallpaper "$HOME/Pictures/backgrounds/my-wallpaper.jpg" fill
+```
+
+Supported modes are `fill`, `max`, `scale`, `center` and `tile`. The selection
+is stored in the native desktop configuration and reapplied at every login.
+To remove it and return to the active theme's solid background:
+
+```sh
+dwm-freebsd-appearance clear-wallpaper
+```
+
+List or select themes from a terminal with:
+
+```sh
+dwm-freebsd-appearance themes
+dwm-freebsd-appearance theme dracula
+```
+
+The helper accepts regular local JPG, PNG, WebP and BMP files. It does not
+download images. Existing custom `themes.toml` files are preserved on update;
+the exact original one-theme native default is migrated to the new palette set.
 
 ## 6. Update, roll back or use the original desktop
 
@@ -219,6 +253,7 @@ desktop in your home directory is not the test target.
 | Network | Read-only IPv4 interface status; no Wi-Fi editor |
 | Battery and load | Native sysctl/load data; unavailable battery is reported explicitly |
 | Bluetooth, brightness, suspend, lock | Not included in this profile |
+| Themes and wallpaper | Four live palettes; persistent local wallpaper through native feh |
 | Full inherited Settings / package updates | Not included; no privileged Fedora helpers run |
 
 The Quickshell package is quickshell-0.3.0_1 on the test VM. Qt Quick defaults

@@ -38,7 +38,7 @@ mkdir -p "$DWM_C9_HOME/logs" "$XDG_DATA_HOME/dwm-titus" "$XDG_CACHE_HOME" "$XDG_
 exec >>"$DWM_C9_HOME/logs/session.log" 2>&1
 printf '%s\n' "$runtime" >"$XDG_STATE_HOME/runtime-path"
 date
-xsetroot -solid '#202b3b'
+dwm-freebsd-appearance apply
 dwm &
 wm=$!
 ready=false

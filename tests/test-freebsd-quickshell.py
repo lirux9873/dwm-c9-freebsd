@@ -59,6 +59,8 @@ def main():
                 processes.append(session)
                 wait_for("runtime", lambda: (prefix / "state/runtime-path").exists())
                 wait_for("Quickshell IPC", lambda: ipc("workspace").returncode == 0)
+                assert ipc("theme", "dracula").returncode == 0
+                wait_for("live theme", lambda: ipc("themeName").stdout.strip() == "dracula")
                 assert run("xdotool", "key", "--clearmodifiers", "super+2").returncode == 0
                 wait_for("workspace model", lambda: ipc("workspace").stdout.strip() == "1")
                 run("xdotool", "key", "--clearmodifiers", "super+1")
