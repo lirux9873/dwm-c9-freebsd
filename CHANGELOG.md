@@ -1,5 +1,8 @@
 # Changelog
 
+- Add an isolated native desktop preview with themed terminals, a live system
+  dashboard, monitor and tiling shortcuts, using the installed minimal dwm.
+
 - Port application launching to native FreeBSD stat/lockf and data directories;
   preserve argument forwarding, exit status and bounded theme-lock waiting.
   Add native boundary tests and full launcher regression coverage to CI.

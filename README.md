@@ -4,6 +4,7 @@ A native FreeBSD 15.1 amd64/X11 port of the dwm-titus desktop. The minimal
 window-manager session works; the full Quickshell desktop is still being ported.
 
 - [Documentation](https://lirux9873.github.io/dwm-c9-freebsd/)
+- [Try the visible desktop preview](docs/FREEBSD-PREVIEW.md)
 - [Test VM setup](docs/FREEBSD-TEST-HOST.md)
 - [Native package profiles](docs/FREEBSD-DEPENDENCIES.md)
 - [Image builders](docs/FREEBSD-IMAGES.md)
