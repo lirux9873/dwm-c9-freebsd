@@ -13,8 +13,8 @@ checkout and produces a customized base filesystem `.tar.xz` with a JSON
 manifest. It is not a bootable disk image: the installer supplies the kernel,
 partitions, bootloader, network configuration, passwords and users.
 
-`scripts/build-dwm-freebsd-installer-iso.sh` replaces the base distribution in
-the matching official disc1 ISO, refreshes its installer manifest, and rebuilds
+`scripts/build-dwm-freebsd-installer-iso.sh` adds the customized base distribution
+to the matching official disc1 ISO, refreshes its installer manifest, and rebuilds
 the ISO with FreeBSD's `release/amd64/mkisoimages.sh`. That upstream tool prepares
 BIOS and UEFI boot structures. Bootability still requires testing both firmware
 paths. The standard interactive FreeBSD installer is retained; there is no
@@ -41,7 +41,7 @@ The ISO builder requires the complete matching source tree, because
 `tar`, `makefs`, `mkimg`, `etdump`, `mount`, `umount`, `chroot` and the compiler.
 
 Download the official FreeBSD 15.1 amd64 **disc1 ISO**, its CHECKSUM.SHA256 file,
-and the matching `base.txz` with its distribution MANIFEST. Use the
+and the matching `base.txz` and `kernel.txz` with their distribution MANIFEST. Use the
 [official download page](https://www.freebsd.org/where/) and
 [FreeBSD verification instructions](https://docs.freebsd.org/en/books/handbook/bsdinstall/).
 Supply the exact trusted SHA256 values below. A hash you compute from an
@@ -68,18 +68,31 @@ repositories can change, so builds are not claimed to be byte-reproducible.
 
 ## Build the installer ISO
 
+FreeBSD 15.1 disc1 normally carries pkgbase packages, not the legacy base/kernel
+archives. The builder uses the checksums in the ISO's distribution MANIFEST to
+verify the existing system image's original base and the supplied kernel:
+
+```sh
+fetch -o /build/kernel.txz https://download.freebsd.org/releases/amd64/15.1-RELEASE/kernel.txz
+```
+
 ```sh
 sh scripts/build-dwm-freebsd-installer-iso.sh \
   --disposable-vm \
   --input /build/FreeBSD-15.1-RELEASE-amd64-disc1.iso \
   --sha256 DISC1_SHA256_FROM_OFFICIAL_CHECKSUM_FILE \
   --system-image /build/dwm-freebsd-15.1.tar.xz \
+  --kernel /build/kernel.txz \
   --freebsd-src /usr/src \
   --output /build/dwm-freebsd-15.1.iso
 ```
 
-The builder verifies that the root filesystem was prepared from exactly the
-`base.txz` shipped on this ISO. Keep each generated artifact with its adjacent
+The builder verifies that the root filesystem was prepared from the exact
+`base.txz` identified by the ISO's MANIFEST. The kernel must match that manifest
+too. Older media already containing `kernel.txz` can omit `--kernel`.
+If an older builder failed with `missing usr/freebsd-dist/base.txz`, update
+the builder and rerun only the ISO step with `--kernel`; the completed system
+image and its JSON manifest can be reused. Keep each generated artifact with its adjacent
 JSON manifest. Existing output files are never replaced. Failed builds retain
 their workspace for diagnosis. If an unmount failed, detach that workspace's
 devfs mount before removing anything; destroying the disposable VM is also a

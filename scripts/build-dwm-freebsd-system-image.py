@@ -166,15 +166,45 @@ def build_system(args, work):
                     "qualification": "experimental; boot and installation not qualified"}
 
 
-def validate_system(image, base):
+def validate_system(image, base=None, *, base_sha256=None):
     metadata = json.loads(image.with_name(image.name + ".json").read_text())
     for key, value in {"kind": "freebsd-dwm-base", "protocol": 1, "release": RELEASE,
                        "architecture": "amd64", "profile": "minimal-x11"}.items():
         if metadata.get(key) != value:
             raise ValueError(f"System image manifest mismatch: {key}")
     verified(image, metadata["sha256"])
-    if metadata["size"] != image.stat().st_size or metadata["source_base_sha256"] != digest(base):
-        raise ValueError("System image must use exactly this ISO's base.txz")
+    expected_base = digest(base) if base is not None else base_sha256
+    if not expected_base or metadata["size"] != image.stat().st_size or metadata["source_base_sha256"] != expected_base:
+        raise ValueError("System image must use the base.txz identified by this ISO's MANIFEST")
+    return metadata
+
+
+def distribution_hash(text, name):
+    entries = [line.split("\t") for line in text.splitlines()
+               if line.split("\t")[0] == name]
+    if len(entries) != 1 or len(entries[0]) < 6 or not re.fullmatch(r"[0-9a-fA-F]{64}", entries[0][1]):
+        raise ValueError(f"Expected one valid {name} checksum in the ISO MANIFEST")
+    return entries[0][1].lower()
+
+
+def stage_distributions(dist, image, kernel=None):
+    """Support both pkgbase media and older media containing distribution sets."""
+    manifest = dist / "MANIFEST"
+    original = manifest.read_text()
+    base_hash = distribution_hash(original, "base.txz")
+    kernel_hash = distribution_hash(original, "kernel.txz")
+    source_kernel = kernel if kernel is not None else dist / "kernel.txz"
+    if not source_kernel.is_file():
+        raise ValueError("This disc1 ISO uses pkgbase and has no kernel.txz. Download the official "
+                         "FreeBSD 15.1 amd64 kernel.txz and rerun with --kernel /path/to/kernel.txz. "
+                         "Your existing system image can be reused.")
+    verified(source_kernel, kernel_hash)
+    metadata = validate_system(image, base_sha256=base_hash)
+    if kernel is not None:
+        shutil.copyfile(kernel, dist / "kernel.txz")
+    shutil.copyfile(image, dist / "base.txz")
+    listing = run("tar", "-tf", dist / "base.txz", capture_output=True, text=True).stdout
+    manifest.write_text(replace_manifest(original, metadata["sha256"], len(listing.splitlines())))
     return metadata
 
 
@@ -198,18 +228,13 @@ def build_iso(args, work):
     media = work / "media"
     media.mkdir()
     run("tar", "-xpf", args.input, "-C", media)
-    for name in ("boot/cdboot", "boot/loader.efi", "boot/pmbr", "usr/freebsd-dist/base.txz",
-                 "usr/freebsd-dist/kernel.txz", "usr/freebsd-dist/MANIFEST"):
+    for name in ("boot/cdboot", "boot/loader.efi", "boot/pmbr", "usr/freebsd-dist/MANIFEST"):
         if not (media / name).is_file():
             raise ValueError(f"Requires a FreeBSD amd64 disc1 ISO; missing {name}")
     if (media / "etc/installerconfig").exists():
         raise ValueError("Refusing media with a pre-existing unattended installer")
     dist = media / "usr/freebsd-dist"
-    metadata = validate_system(args.system_image, dist / "base.txz")
-    shutil.copyfile(args.system_image, dist / "base.txz")
-    listing = run("tar", "-tf", dist / "base.txz", capture_output=True, text=True).stdout
-    manifest = dist / "MANIFEST"
-    manifest.write_text(replace_manifest(manifest.read_text(), digest(dist / "base.txz"), len(listing.splitlines())))
+    metadata = stage_distributions(dist, args.system_image, args.kernel)
     shutil.copyfile(args.system_image.with_name(args.system_image.name + ".json"), media / "DWM-IMAGE.json")
     write(media, "DWM-README.txt", "FreeBSD 15.1 amd64 with experimental minimal dwm.\nChoose Distribution Sets (NOT Packages/Tech Preview) in the interactive installer.\nInclude the base and kernel sets. The package-based path does not install dwm.\nAfter installation log in as a regular user and run:\nstartx /usr/local/bin/dwm-c9-session\nNo unattended partitioning or default password is configured.\n")
     staged = work / "installer.iso"
@@ -232,13 +257,14 @@ def main(argv=None):
     parser.add_argument("--disposable-vm", action="store_true", help="Acknowledge this is a disposable FreeBSD builder VM")
     parser.add_argument("--system-image", type=Path, help="Installer mode: root filesystem and adjacent JSON manifest")
     parser.add_argument("--freebsd-src", type=Path, help="Installer mode: complete matching releng/15.1 source tree")
+    parser.add_argument("--kernel", type=Path, help="Installer mode: official kernel.txz, required when absent from disc1")
     args = parser.parse_args(argv)
     if not args.disposable_vm:
         parser.error("--disposable-vm is required; package scripts execute in a privileged chroot")
     if args.installer != bool(args.system_image and args.freebsd_src):
         parser.error("Installer mode requires --system-image and --freebsd-src")
-    if not args.installer and (args.system_image or args.freebsd_src):
-        parser.error("--system-image and --freebsd-src are installer-only")
+    if not args.installer and (args.system_image or args.freebsd_src or args.kernel):
+        parser.error("--system-image, --freebsd-src and --kernel are installer-only")
     args.input = args.input.resolve(strict=True)
     args.output = args.output.absolute()
     suffix = ".iso" if args.installer else ".tar.xz"
