@@ -1,0 +1,62 @@
+#!/bin/sh
+set -eu
+: "${DWM_C9_HOME:?Run the installed start-session script}"
+[ "$(uname -s)" = FreeBSD ] && [ "$(id -u)" -ne 0 ] || exit 1
+[ -n "${DISPLAY:-}" ] || { echo 'Use startx from the VM console.' >&2; exit 1; }
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+    exec dbus-run-session -- "$0"
+fi
+export XDG_CONFIG_HOME="$DWM_C9_HOME/config"
+export XDG_DATA_HOME="$DWM_C9_HOME/data"
+export XDG_CACHE_HOME="$DWM_C9_HOME/cache"
+export XDG_STATE_HOME="$DWM_C9_HOME/state"
+export XDG_DATA_DIRS=/usr/local/share:/usr/share
+export PATH="$DWM_C9_HOME/current/bin:$PATH"
+export QT_QPA_PLATFORM=xcb
+# VirtualBox and Xvfb work reliably without accelerated Qt Quick rendering.
+export QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-software}"
+if xprop -root _NET_SUPPORTING_WM_CHECK 2>/dev/null | grep -q 'window id'; then
+    echo 'Log out of the current desktop before starting this session.' >&2
+    exit 1
+fi
+runtime=$(mktemp -d /tmp/dwm-c9-session.XXXXXXXX)
+export XDG_RUNTIME_DIR=$runtime
+wm= shell=
+cleanup() {
+    trap - EXIT HUP INT TERM
+    for child in "$shell" "$wm"; do
+        [ -z "$child" ] || kill "$child" 2>/dev/null || :
+    done
+    for child in "$shell" "$wm"; do
+        [ -z "$child" ] || wait "$child" 2>/dev/null || :
+    done
+    rm -rf "$runtime"
+}
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+mkdir -p "$DWM_C9_HOME/logs" "$XDG_DATA_HOME/dwm-titus" "$XDG_CACHE_HOME" "$XDG_STATE_HOME"
+exec >>"$DWM_C9_HOME/logs/session.log" 2>&1
+printf '%s\n' "$runtime" >"$XDG_STATE_HOME/runtime-path"
+date
+xsetroot -solid '#202b3b'
+dwm &
+wm=$!
+ready=false
+for attempt in $(jot 100); do
+    kill -0 "$wm" 2>/dev/null || { echo 'dwm failed to start'; exit 1; }
+    if xprop -root _NET_SUPPORTING_WM_CHECK 2>/dev/null | grep -q 'window id'; then
+        ready=true; break
+    fi
+    sleep 0.1
+done
+[ "$ready" = true ] || { echo 'dwm readiness timeout'; exit 1; }
+quickshell --no-duplicate --no-color --path "$XDG_CONFIG_HOME/quickshell/shell.qml" &
+shell=$!
+while kill -0 "$wm" 2>/dev/null; do
+    if ! kill -0 "$shell" 2>/dev/null; then
+        echo 'Quickshell exited unexpectedly; see the preceding log messages.'
+        exit 1
+    fi
+    sleep 1
+done
+wait "$wm"

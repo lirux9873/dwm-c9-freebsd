@@ -1,7 +1,9 @@
 # dwm-c9-freebsd
 
 A native FreeBSD 15.1 amd64/X11 port of the dwm-titus desktop. The minimal
-window-manager session works; the full Quickshell desktop is still being ported.
+window-manager session and a native Quickshell profile now run on FreeBSD.
+[Start the graphical desktop](docs/FREEBSD-DESKTOP.md); hardware-specific services
+and the full inherited Settings application remain outside this profile.
 
 - [Documentation](https://lirux9873.github.io/dwm-c9-freebsd/)
 - [Try the visible desktop preview](docs/FREEBSD-PREVIEW.md)
@@ -24,8 +26,8 @@ administration runs separately as root. The POSIX package profile helper lists
 native package names and never installs anything by itself.
 
 Do not run the inherited install.sh, gmake install or source synchronization
-installer on FreeBSD. General native installation, Quickshell service providers,
-privileged system management and updates remain migration work.
+installer on FreeBSD. Use scripts/install-freebsd-desktop.py for the separate user installation.
+Privileged system management and updates remain migration work.
 
 ## Configuration and migration
 

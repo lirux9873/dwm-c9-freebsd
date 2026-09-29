@@ -18,7 +18,7 @@ clean_line() {
 
 root_property_value() {
 	prop=$1
-	xprop -root "$prop" 2>/dev/null | sed -n 's/^[^=]*= //p'
+	xprop -root "$prop" 2>/dev/null | sed -n 's/^[^=]*= //p; s/^.*window id # //p'
 }
 
 root_status() {
@@ -115,7 +115,7 @@ window_title() {
 	[ -n "$window_id" ] || return 1
 	xprop -id "$window_id" _NET_WM_NAME WM_NAME 2>/dev/null |
 		awk -F'= ' '
-			/^_NET_WM_NAME/ {
+			/^_NET_WM_NAME[^=]*= / {
 				title = $2
 				gsub(/^"/, "", title)
 				gsub(/"$/, "", title)
@@ -220,6 +220,10 @@ switch_workspace() {
 		return 2
 		;;
 	esac
+	if [ "$(uname -s)" = FreeBSD ]; then
+		xdotool set_desktop "$target"
+		return
+	fi
 	command -v wmctrl >/dev/null 2>&1 || {
 		printf 'wmctrl is required for workspace switching\n' >&2
 		return 127
@@ -236,7 +240,11 @@ focus_window() {
 		return 2
 		;;
 	esac
-	wmctrl -ia "$target"
+	if [ "$(uname -s)" = FreeBSD ]; then
+		xdotool windowactivate "$target"
+	else
+		wmctrl -ia "$target"
+	fi
 }
 
 case ${1:-state} in

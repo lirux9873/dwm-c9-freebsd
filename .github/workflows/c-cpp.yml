@@ -44,7 +44,7 @@ jobs:
             pw useradd -n dwmci -m -s /bin/sh
           run: |
             set -eu
-            packages=$(sh scripts/dwm-freebsd-packages.sh test)
+            packages=$({ sh scripts/dwm-freebsd-packages.sh test; sh scripts/dwm-freebsd-packages.sh desktop; } | sort -u)
             pkg install -y $packages
             freebsd-version -kru
             uname -m
@@ -55,3 +55,6 @@ jobs:
             su -l dwmci -c 'cd /home/dwmci/source && sh tests/test-quickshell-launcher.sh'
             su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-image-builders.py'
             su -l dwmci -c 'cd /home/dwmci/source && env DWM_FREEBSD_X11_SMOKE=1 sh tests/test-freebsd-core.sh'
+            su -l dwmci -c 'cd /home/dwmci/source && python3 tests/test-freebsd-installer.py'
+            su -l dwmci -c 'cd /home/dwmci/source && python3 scripts/install-freebsd-desktop.py --prefix /home/dwmci/c9-desktop'
+            su -l dwmci -c 'cd /home/dwmci/source && dbus-run-session -- python3 tests/test-freebsd-quickshell.py /home/dwmci/c9-desktop'

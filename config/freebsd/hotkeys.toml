@@ -1,0 +1,24 @@
+[vars]
+terminal = "dwm-c9-terminal"
+keys = [
+  { mod="SUPER", key="d", func="spawn", exec=["dwm-c9-shell-control", "launcher"] },
+  { mod="SUPER", key="s", func="spawn", exec=["dwm-c9-shell-control", "controls"] },
+  { mod="SUPER", key="n", func="spawn", exec=["dwm-c9-shell-control", "notifications"] },
+  { mod="SUPER", key="Return", func="spawn", exec=["dwm-c9-terminal"] },
+  { mod="SUPER", key="m", func="spawn", exec=["dwm-c9-terminal", "-T", "System monitor", "-e", "top"] },
+  { mod="SUPER", key="j", func="focusstack", i=1 },
+  { mod="SUPER", key="k", func="focusstack", i=-1 },
+  { mod="SUPER SHIFT", key="Return", func="zoom" },
+  { mod="SUPER", key="h", func="setmfact", f=-0.05 },
+  { mod="SUPER", key="l", func="setmfact", f=0.05 },
+  { mod="SUPER", key="t", func="setlayout", layout_idx=0 },
+  { mod="SUPER", key="f", func="setlayout", layout_idx=1 },
+  { mod="SUPER", key="space", func="setlayout", layout_idx=2 },
+  { mod="SUPER SHIFT", key="c", func="killclient" },
+  { mod="SUPER SHIFT", key="q", func="quit" },
+]
+tag_keys = [
+  { key="1", tag=0 }, { key="2", tag=1 }, { key="3", tag=2 },
+  { key="4", tag=3 }, { key="5", tag=4 }, { key="6", tag=5 },
+  { key="7", tag=6 }, { key="8", tag=7 }, { key="9", tag=8 },
+]

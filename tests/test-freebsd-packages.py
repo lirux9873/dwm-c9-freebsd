@@ -15,7 +15,7 @@ class Profiles(unittest.TestCase):
 
     def test_profiles(self):
         profiles = {}
-        for name in ("build", "runtime", "test", "image", "host"):
+        for name in ("build", "runtime", "test", "image", "host", "desktop"):
             result = self.run_profile(name)
             self.assertEqual(result.returncode, 0, result.stderr)
             packages = result.stdout.splitlines()
@@ -26,6 +26,7 @@ class Profiles(unittest.TestCase):
             profiles[name] = set(packages)
         self.assertLessEqual(profiles["build"] | profiles["runtime"], profiles["image"])
         self.assertIn("git", profiles["image"])
+        self.assertLessEqual(profiles["build"] | profiles["runtime"] | {"quickshell", "python3", "bash", "xdotool", "xprop"}, profiles["desktop"])
         self.assertLessEqual({"python3", "xorg-vfbserver", "xdotool", "xprop"}, profiles["test"])
         self.assertLessEqual(profiles["build"] | {"git", "python3"}, profiles["host"])
 

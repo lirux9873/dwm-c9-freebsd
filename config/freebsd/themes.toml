@@ -1,0 +1,11 @@
+[active]
+theme = "preview"
+[appearance]
+borderpx = 3
+[theme.preview]
+normfgcolor = "#c4cfdf"
+normbgcolor = "#18212f"
+normbordercolor = "#29384d"
+selfgcolor = "#101820"
+selbgcolor = "#72d6c9"
+selbordercolor = "#72d6c9"

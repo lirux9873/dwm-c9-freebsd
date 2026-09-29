@@ -1,4 +1,5 @@
 export const navigation = [
+  { href: "/desktop.html", label: "Native desktop", index: "01b", group: "Start" },
   { href: "/documentation.html", label: "Editing these docs", index: "00", group: "Project" },
   { href: "/install.html", label: "FreeBSD guide", index: "01", group: "Start" },
   { href: "/test-host.html", label: "Test VM setup", index: "01a", group: "Start" },
