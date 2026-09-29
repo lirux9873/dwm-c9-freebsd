@@ -1,5 +1,9 @@
 # Changelog
 
+- Port application launching to native FreeBSD stat/lockf and data directories;
+  preserve argument forwarding, exit status and bounded theme-lock waiting.
+  Add native boundary tests and full launcher regression coverage to CI.
+
 - Share native FreeBSD dependency profiles between image creation and CI;
   include Git in new minimal images and document the native package mapping.
 - Remove Steam/gaming, Flatpak, Gear Lever/AppImage and Herdr integrations

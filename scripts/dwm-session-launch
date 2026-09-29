@@ -2,6 +2,31 @@
 set -eu
 
 max_theme_environment_size=4096
+platform=$(uname -s)
+
+file_stat() {
+	# Keep the requested metadata explicit: owner, link count, and byte size.
+	if [ "$platform" = FreeBSD ]; then
+		case $1 in
+		u) format=%u ;;
+		h) format=%l ;;
+		s) format=%z ;;
+		*) return 1 ;;
+		esac
+		stat -f "$format" -- "$2"
+	else
+		stat -c "%$1" -- "$2"
+	fi
+}
+
+lock_theme_environment() {
+	if [ "$platform" = FreeBSD ]; then
+		# FreeBSD 15.1 lockf retains the lock on the inherited open descriptor.
+		lockf -s -t 2 8
+	else
+		flock -w 2 8
+	fi
+}
 
 decode_theme_environment_value() {
 	encoded_value=$1
@@ -80,35 +105,43 @@ refresh_theme_environment() {
 		(umask 077 && mkdir -p -- "$runtime_base") || return 1
 	fi
 	if [ ! -d "$runtime_base" ] || [ -L "$runtime_base" ] ||
-		[ "$(stat -c %u -- "$runtime_base")" != "$session_uid" ]; then
+		[ "$(file_stat u "$runtime_base")" != "$session_uid" ]; then
 		return 1
 	fi
-	chmod 700 -- "$runtime_base" || return 1
+	chmod 700 "$runtime_base" || return 1
 	theme_lock=$runtime_base/dwm-theme-apply.lock
+	if [ -L "$theme_lock" ]; then
+		return 1
+	fi
 	if [ -e "$theme_lock" ] &&
 		{ [ ! -f "$theme_lock" ] || [ -L "$theme_lock" ] ||
-			[ "$(stat -c %u -- "$theme_lock")" != "$session_uid" ]; }; then
+			[ "$(file_stat u "$theme_lock")" != "$session_uid" ] ||
+			[ "$(file_stat h "$theme_lock")" != 1 ]; }; then
 		return 1
 	fi
-	command -v flock >/dev/null 2>&1 || return 1
+	if [ "$platform" = FreeBSD ]; then
+		command -v lockf >/dev/null 2>&1 || return 1
+	else
+		command -v flock >/dev/null 2>&1 || return 1
+	fi
 	: >>"$theme_lock" || return 1
-	chmod 600 -- "$theme_lock" || return 1
-	exec 8>"$theme_lock"
-	if ! flock -w 2 8; then
+	chmod 600 "$theme_lock" || return 1
+	exec 8>>"$theme_lock"
+	if ! lock_theme_environment; then
 		exec 8>&-
 		return 1
 	fi
 	if [ -f "$theme_env" ] && [ ! -L "$theme_env" ] &&
-		[ "$(stat -c %u -- "$theme_env")" = "$session_uid" ] &&
-		[ "$(stat -c %h -- "$theme_env")" = 1 ] &&
-		[ "$(stat -c %s -- "$theme_env")" -le "$max_theme_environment_size" ] &&
+		[ "$(file_stat u "$theme_env")" = "$session_uid" ] &&
+		[ "$(file_stat h "$theme_env")" = 1 ] &&
+		[ "$(file_stat s "$theme_env")" -le "$max_theme_environment_size" ] &&
 		parse_theme_environment "$theme_env"; then
 		QT_QPA_PLATFORMTHEME=$parsed_qt_theme
 		XCURSOR_THEME=$parsed_cursor_theme
 		XCURSOR_SIZE=$parsed_cursor_size
 		export QT_QPA_PLATFORMTHEME XCURSOR_THEME XCURSOR_SIZE
 	fi
-	flock -u 8
+	# Closing the last descriptor releases the lock before launching the app.
 	exec 8>&-
 }
 
@@ -119,13 +152,19 @@ refresh_theme_environment() {
 
 # Toolkit children need custom installation data roots even when launched
 # from dwm's original environment after a theme change.
-case $0 in
-*/bin/*) data_updater=${0%/*}/dwm-desktop-update ;;
-*) data_updater=$(command -v dwm-desktop-update 2>/dev/null || :) ;;
-esac
-if [ -n "$data_updater" ] && session_data_dirs=$("$data_updater" data-directories 2>/dev/null); then
-	XDG_DATA_DIRS=$session_data_dirs
+if [ "$platform" = FreeBSD ]; then
+	# Native package desktop entries live under LOCALBASE, without an updater.
+	XDG_DATA_DIRS=${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
 	export XDG_DATA_DIRS
+else
+	case $0 in
+	*/bin/*) data_updater=${0%/*}/dwm-desktop-update ;;
+	*) data_updater=$(command -v dwm-desktop-update 2>/dev/null || :) ;;
+	esac
+	if [ -n "$data_updater" ] && session_data_dirs=$("$data_updater" data-directories 2>/dev/null); then
+		XDG_DATA_DIRS=$session_data_dirs
+		export XDG_DATA_DIRS
+	fi
 fi
 
 # A damaged optional environment record must not prevent application launch.
